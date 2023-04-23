@@ -218,6 +218,7 @@ impl<T: Display> Display for Matrix<T> {
                 }
             }
             write!(f, "]")?;
+            write!(f, "\n")?;
         }
         Ok(())
     }
@@ -229,6 +230,7 @@ mod tests {
 
     // Tests for matrix.rs
     fn gen_matrix_3_2() -> Matrix<u64> {
+        // 3 rows, 2 cols
         Matrix::<u64>::from(
             vec![
                 vec![1u64, 2u64, 3u64],
@@ -238,6 +240,7 @@ mod tests {
     }
 
     fn gen_matrix_2_3() -> Matrix<u64> {
+        // 2 rows, 3 cols
         Matrix::<u64>::from(
             vec![
                 vec![1u64, 4u64],
@@ -248,6 +251,7 @@ mod tests {
     }
 
     fn gen_matrix_2_2() -> Matrix<u64> {
+        // 2 rows, 2 cols
         Matrix::<u64>::from(
             vec![
                 vec![14u64, 32u64],
@@ -257,6 +261,7 @@ mod tests {
     }
 
     fn gen_matrix_1_2() -> Matrix<u64> {
+        // 1 rows, 2 cols
         Matrix::<u64>::from(
             vec![
                 vec![14u64], vec![32u64]
