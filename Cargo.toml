@@ -1,0 +1,8 @@
+[package]
+name = "regev-rs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+num-bigint = { version = "0.4.3", features = ["rand"] }
+num = "0.4.0"
