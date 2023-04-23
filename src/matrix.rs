@@ -56,7 +56,7 @@ impl<T: Clone + Zero + Mul + Add + AddAssign + Sub + Mul<Output = T>> Matrix<T> 
         Matrix { data: vec![] }
     }
 
-    /// Initialise a matrix from a Vector of Vector
+    /// Initialise a matrix from Vectors of Vectors of elements
     pub fn from(data: Vec<Vec<T>>) -> Self {
         let mut matrix = Self::new();
         matrix.data = data;
@@ -226,63 +226,57 @@ impl<T: Display> Display for Matrix<T> {
 #[cfg(test)]
 mod tests {
     use super::Matrix;
-    use num::traits::identities::Zero;
-    use num_bigint::BigUint;
 
     // Tests for matrix.rs
-    fn gen_matrix_3_2() -> Matrix<BigUint> {
-        Matrix::<BigUint>::from(
+    fn gen_matrix_3_2() -> Matrix<u64> {
+        Matrix::<u64>::from(
             vec![
-                vec![BigUint::from(1u64), BigUint::from(2u64), BigUint::from(3u64),],
-                vec![BigUint::from(4u64), BigUint::from(5u64), BigUint::from(6u64),],
+                vec![1u64, 2u64, 3u64],
+                vec![4u64, 5u64, 6u64],
             ]
         )
     }
 
-    fn gen_matrix_2_3() -> Matrix<BigUint> {
-        Matrix::<BigUint>::from(
+    fn gen_matrix_2_3() -> Matrix<u64> {
+        Matrix::<u64>::from(
             vec![
-                vec![BigUint::from(1u64), BigUint::from(4u64)],
-                vec![BigUint::from(2u64), BigUint::from(5u64)],
-                vec![BigUint::from(3u64), BigUint::from(6u64)],
+                vec![1u64, 4u64],
+                vec![2u64, 5u64],
+                vec![3u64, 6u64],
             ]
         )
     }
 
-    fn gen_matrix_2_2() -> Matrix<BigUint> {
-        Matrix::<BigUint>::from(
+    fn gen_matrix_2_2() -> Matrix<u64> {
+        Matrix::<u64>::from(
             vec![
-                vec![BigUint::from(14u64), BigUint::from(32u64)],
-                vec![BigUint::from(32u64), BigUint::from(77u64)],
+                vec![14u64, 32u64],
+                vec![32u64, 77u64],
             ]
         )
     }
 
-    fn gen_matrix_1_2() -> Matrix<BigUint> {
-        Matrix::<BigUint>::from(
+    fn gen_matrix_1_2() -> Matrix<u64> {
+        Matrix::<u64>::from(
             vec![
-                vec![BigUint::from(14u64)], vec![BigUint::from(32u64)]
+                vec![14u64], vec![32u64]
             ]
         )
     }
 
-    fn gen_vec_3() -> Vec<BigUint> {
-        vec![
-            BigUint::from(1u64),
-            BigUint::from(2u64),
-            BigUint::from(3u64),
-        ]
+    fn gen_vec_3() -> Vec<u64> {
+        vec![1u64, 2u64, 3u64]
     }
 
     #[test]
     fn test_indices() {
         let mut m = gen_matrix_3_2();
-        assert_eq!(m[0][0], BigUint::from(1u64));
-        assert_eq!(m[0][1], BigUint::from(2u64));
-        assert_eq!(m[1][1], BigUint::from(5u64));
+        assert_eq!(m[0][0], 1u64);
+        assert_eq!(m[0][1], 2u64);
+        assert_eq!(m[1][1], 5u64);
 
-        m[1][1] = BigUint::zero();
-        assert_eq!(m[1][1], BigUint::zero());
+        m[1][1] = 0u64;
+        assert_eq!(m[1][1], 0u64);
     }
 
     #[test]

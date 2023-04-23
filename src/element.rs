@@ -2,11 +2,16 @@ use num::traits::identities::Zero;
 pub use num_bigint::BigUint;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
+use rand_distr::{Normal, Distribution};
+use rand::{
+    rngs::StdRng,
+    SeedableRng,
+};
 
 #[derive(Debug, PartialEq)]
 pub struct Element {
-    pub q: BigUint,
-    pub uint: BigUint,
+    pub(crate) q: BigUint,
+    pub(crate) uint: BigUint,
 }
 
 impl Element {
@@ -18,7 +23,26 @@ impl Element {
     }
 
     pub fn from(q: BigUint, uint: BigUint) -> Self {
+        assert!(q < BigUint::from(u64::MAX));
+        assert!(uint < BigUint::from(u64::MAX));
+
         Self { q, uint }
+    }
+
+    /// Generate a random Element following a normal (Gaussian) distribution.
+    ///
+    /// # Parameters 
+    ///
+    /// - `q`: The element modulus
+    /// - `std_dev`: The standard deviation of the distribution.
+    pub fn gen_normal_rand(q: BigUint, std_dev: f64) -> Self {
+        let mean_buint = &q / BigUint::from(2u64);
+        let mean = mean_buint.to_u64_digits()[0] as f64;
+        let normal = Normal::new(mean, std_dev).unwrap();
+
+        let mut rng = StdRng::from_entropy();
+        let v = BigUint::from(normal.sample(&mut rng) as u64);
+        Self::from(q, v)
     }
 }
 
@@ -193,4 +217,15 @@ mod tests {
         f *= g;
         assert_eq!(f.uint, BigUint::from(99u64));
     }
+
+    /*
+    #[test]
+    fn test_gen_normal_rand() {
+        let q = gen_q();
+        for i in 0..100 {
+            let e = Element::gen_normal_rand(q.clone(), 6.4 as f64);
+            println!("{}", e);
+        }
+    }
+    */
 }
