@@ -1,7 +1,9 @@
+use crate::zeroq::ZeroQ;
+use rand_distr::num_traits::Zero;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
-use num::traits::identities::Zero;
 use rand_distr::{Normal, Distribution};
+use std::cmp::{Ordering, PartialOrd};
 use rand::{
     rngs::StdRng,
     SeedableRng,
@@ -45,6 +47,12 @@ impl Element {
     }
 }
 
+impl PartialOrd for Element {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.uint.cmp(&other.uint))
+    }
+}
+
 impl Clone for Element {
     fn clone(&self) -> Self {
         Self {
@@ -80,10 +88,10 @@ impl MulAssign for Element {
     }
 }
 
-impl Zero for Element {
-    fn zero() -> Self {
+impl ZeroQ for Element {
+    fn zero(q: u64) -> Self {
         return Element {
-            q: 0u64,
+            q,
             uint: 0u64,
         }
     }

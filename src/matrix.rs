@@ -1,41 +1,42 @@
-use num::traits::identities::Zero;
+use crate::zeroq::ZeroQ;
+use crate::element::Element;
 use std::clone::Clone;
 use std::default::Default;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, AddAssign, Sub, SubAssign, Index, IndexMut, Mul, MulAssign};
 
 #[derive(Debug, PartialEq)]
-pub struct Matrix<T> {
-    pub data: Vec<Vec<T>>,
+pub struct Matrix {
+    pub data: Vec<Vec<Element>>,
 }
 
-impl<T> Index<usize> for Matrix<T> {
-    type Output = Vec<T>;
+impl Index<usize> for Matrix {
+    type Output = Vec<Element>;
     fn index(&self, i: usize) -> &Self::Output {
         &self.data[i]
     }
 }
 
-impl<T> IndexMut<usize> for Matrix<T> {
-    fn index_mut(&mut self, i: usize) -> &mut Vec<T> {
+impl IndexMut<usize> for Matrix {
+    fn index_mut(&mut self, i: usize) -> &mut Vec<Element> {
         &mut self.data[i]
     }
 }
 
-impl<T: Clone> Clone for Matrix<T> {
+impl Clone for Matrix {
     fn clone(&self) -> Self {
         if self.data.is_empty() {
             return Matrix { data: vec![] };
         }
-        let mut d: Vec<Vec<T>> = Vec::with_capacity(self.data.len());
+        let mut d: Vec<Vec<Element>> = Vec::with_capacity(self.data.len());
         for i in 0..self.data.len() {
-            let mut e = Vec::<T>::with_capacity(self.data[i].len());
+            let mut e = Vec::<Element>::with_capacity(self.data[i].len());
             for j in 0..self.data[i].len() {
                 e.push(self.data[i][j].clone());
             }
             d.push(e);
         }
-        Matrix::<T> { data: d }
+        Matrix { data: d }
     }
 
     fn clone_from(&mut self, source: &Self) {
@@ -44,26 +45,26 @@ impl<T: Clone> Clone for Matrix<T> {
     }
 }
 
-impl<T: Clone + Zero + Mul + Add + AddAssign + Sub + Mul<Output = T>> Default for Matrix<T> {
-    fn default() -> Matrix<T> {
+impl Default for Matrix {
+    fn default() -> Matrix {
         Matrix::new()
     }
 }
 
-impl<T: Clone + Zero + Mul + Add + AddAssign + Sub + Mul<Output = T>> Matrix<T> {
+impl Matrix {
     /// Initialise an empty matrix (0 by 0)
-    pub fn new() -> Matrix<T> {
+    pub fn new() -> Matrix {
         Matrix { data: vec![] }
     }
 
     /// Initialise a matrix from Vectors of Vectors of elements
-    pub fn from(data: Vec<Vec<T>>) -> Self {
+    pub fn from(data: Vec<Vec<Element>>) -> Self {
         let mut matrix = Self::new();
         matrix.data = data;
         matrix
     }
 
-    pub fn push(&mut self, row: Vec<T>) {
+    pub fn push(&mut self, row: Vec<Element>) {
         self.data.push(row);
     }
 
@@ -76,7 +77,7 @@ impl<T: Clone + Zero + Mul + Add + AddAssign + Sub + Mul<Output = T>> Matrix<T> 
 
     #[allow(clippy::needless_range_loop)]
     pub fn rotated(self) -> Self {
-        let zero = T::zero();
+        let zero = Element::zero(self.data[0][0].q);
         let new_row = vec![zero; self.num_cols()];
         let mut rotated = vec![new_row; self.num_rows()];
         for i in 0..self.num_cols() {
@@ -87,10 +88,11 @@ impl<T: Clone + Zero + Mul + Add + AddAssign + Sub + Mul<Output = T>> Matrix<T> 
         Self::from(rotated)
     }
 
-    pub fn mul_vec(self, rhs: Vec<T>) -> Self {
+    pub fn mul_vec(self, rhs: Vec<Element>) -> Self {
         let rhs_matrix = Self::from(vec![rhs]).rotated();
         self.mul(rhs_matrix)
     }
+
     pub fn num_rows(&self) -> usize {
         self.data[0].len()
     }
@@ -104,10 +106,10 @@ impl<T: Clone + Zero + Mul + Add + AddAssign + Sub + Mul<Output = T>> Matrix<T> 
     }
 }
 
-impl<T: Clone + Zero + Mul + Add + AddAssign + Sub + Mul<Output = T>> Add for Matrix<T> {
-    type Output = Matrix<T>;
+impl Add for Matrix {
+    type Output = Matrix;
     #[allow(clippy::needless_range_loop)]
-    fn add(self, rhs: Matrix<T>) -> Self::Output {
+    fn add(self, rhs: Matrix) -> Self::Output {
         assert_eq!(self.num_rows(), rhs.num_rows());
         assert_eq!(self.num_cols(), rhs.num_cols());
 
@@ -122,8 +124,8 @@ impl<T: Clone + Zero + Mul + Add + AddAssign + Sub + Mul<Output = T>> Add for Ma
     }
 }
 
-impl<T: Clone + Zero + Mul + Add + AddAssign + Sub + Mul<Output = T>> AddAssign for Matrix<T> {
-    fn add_assign(&mut self, rhs: Matrix<T>) {
+impl AddAssign for Matrix {
+    fn add_assign(&mut self, rhs: Matrix) {
         assert_eq!(self.num_rows(), rhs.num_rows());
         assert_eq!(self.num_cols(), rhs.num_cols());
         for i in 0..self.num_cols() {
@@ -134,10 +136,10 @@ impl<T: Clone + Zero + Mul + Add + AddAssign + Sub + Mul<Output = T>> AddAssign 
     }
 }
 
-impl<T: Clone + Zero + Mul + Add + AddAssign + Sub + Mul<Output = T> + Sub<Output = T>> Sub for Matrix<T> {
-    type Output = Matrix<T>;
+impl Sub for Matrix {
+    type Output = Matrix;
     #[allow(clippy::needless_range_loop)]
-    fn sub(self, rhs: Matrix<T>) -> Self::Output {
+    fn sub(self, rhs: Matrix) -> Self::Output {
         assert_eq!(self.num_rows(), rhs.num_rows());
         assert_eq!(self.num_cols(), rhs.num_cols());
 
@@ -152,8 +154,8 @@ impl<T: Clone + Zero + Mul + Add + AddAssign + Sub + Mul<Output = T> + Sub<Outpu
     }
 }
 
-impl<T: Clone + Zero + Mul + Add + AddAssign + Sub + Mul<Output = T> + Sub<Output = T>> SubAssign for Matrix<T> {
-    fn sub_assign(&mut self, rhs: Matrix<T>) {
+impl SubAssign for Matrix {
+    fn sub_assign(&mut self, rhs: Matrix) {
         assert_eq!(self.num_rows(), rhs.num_rows());
         assert_eq!(self.num_cols(), rhs.num_cols());
         for i in 0..self.num_cols() {
@@ -164,30 +166,30 @@ impl<T: Clone + Zero + Mul + Add + AddAssign + Sub + Mul<Output = T> + Sub<Outpu
     }
 }
 
-impl<T: Clone + Zero + Mul + Add + AddAssign + Sub + Mul<Output = T>> Mul for Matrix<T> {
+impl Mul for Matrix {
     /*
      * [a00, a01, a02] [b00, b01] = [a00b00 + a01b10 + a02b20, a00b01 + a01b11 + a02b21]
      * [a10, a11, a12] [b10, b11]   [a10b00 + a11b10 * a12b20, a10b01 + a11b11 * a12b21]
      *                 [b20, b21]
      */
-    type Output = Matrix<T>;
+    type Output = Matrix;
     #[allow(clippy::needless_range_loop)]
-    fn mul(self, rhs: Matrix<T>) -> Self::Output {
+    fn mul(self, rhs: Matrix) -> Self::Output {
         // Ensure that the rhs matrix has the correct dimensions
         assert_eq!(self.num_rows(), rhs.num_cols());
 
         // Assign a result matrix of the required dimensions with 0s in each cell
-        let zero = T::zero();
+        let zero = Element::zero(self.data[0][0].q);
         let n = self.num_cols();
         let m = self.num_rows(); // = rhs.num_cols()
         let p = rhs.num_rows();
 
-        let each_result_row = vec![zero; p];
-        let mut result: Vec<Vec<T>> = vec![each_result_row; n];
+        let each_result_row = vec![zero.clone(); p];
+        let mut result: Vec<Vec<Element>> = vec![each_result_row; n];
 
         for i in 0..n {
             for j in 0..p {
-                let mut sum = T::zero();
+                let mut sum = zero.clone();
                 for k in 0..m {
                     sum += self.data[i][k].clone() * rhs[k][j].clone();
                 }
@@ -199,15 +201,15 @@ impl<T: Clone + Zero + Mul + Add + AddAssign + Sub + Mul<Output = T>> Mul for Ma
     }
 }
 
-impl<T: Clone + Zero + Mul + Add + AddAssign + Sub + Mul<Output = T>> MulAssign for Matrix<T> {
-    fn mul_assign(&mut self, rhs: Matrix<T>) {
+impl MulAssign for Matrix {
+    fn mul_assign(&mut self, rhs: Matrix) {
         let mut s = self.clone();
         s = s * rhs;
         *self = s;
     }
 }
 
-impl<T: Display> Display for Matrix<T> {
+impl Display for Matrix {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         for row in self.data.iter() {
             write!(f, "[")?;
@@ -227,61 +229,76 @@ impl<T: Display> Display for Matrix<T> {
 #[cfg(test)]
 mod tests {
     use super::Matrix;
+    use super::Element;
+
+    fn gen_q() -> u64 {
+        return 101u64;
+    }
 
     // Tests for matrix.rs
-    fn gen_matrix_3_2() -> Matrix<u64> {
+    fn gen_matrix_3_2() -> Matrix {
+        let q = gen_q();
         // 3 rows, 2 cols
-        Matrix::<u64>::from(
+        Matrix::from(
             vec![
-                vec![1u64, 2u64, 3u64],
-                vec![4u64, 5u64, 6u64],
+                vec![Element::from(q, 1u64), Element::from(q, 2u64), Element::from(q, 3u64)],
+                vec![Element::from(q, 4u64), Element::from(q, 5u64), Element::from(q, 6u64)],
             ]
         )
     }
 
-    fn gen_matrix_2_3() -> Matrix<u64> {
+    fn gen_matrix_2_3() -> Matrix {
+        let q = gen_q();
         // 2 rows, 3 cols
-        Matrix::<u64>::from(
+        Matrix::from(
             vec![
-                vec![1u64, 4u64],
-                vec![2u64, 5u64],
-                vec![3u64, 6u64],
+                vec![Element::from(q, 1u64), Element::from(q, 4u64)],
+                vec![Element::from(q, 2u64), Element::from(q, 5u64)],
+                vec![Element::from(q, 3u64), Element::from(q, 6u64)],
             ]
         )
     }
 
-    fn gen_matrix_2_2() -> Matrix<u64> {
+    fn gen_matrix_2_2() -> Matrix {
+        let q = gen_q();
         // 2 rows, 2 cols
-        Matrix::<u64>::from(
+        Matrix::from(
             vec![
-                vec![14u64, 32u64],
-                vec![32u64, 77u64],
+                vec![Element::from(q, 14u64), Element::from(q, 32u64)],
+                vec![Element::from(q, 32u64), Element::from(q, 77u64)],
             ]
         )
     }
 
-    fn gen_matrix_1_2() -> Matrix<u64> {
+    fn gen_matrix_1_2() -> Matrix {
+        let q = gen_q();
         // 1 rows, 2 cols
-        Matrix::<u64>::from(
+        Matrix::from(
             vec![
-                vec![14u64], vec![32u64]
+                vec![Element::from(q, 14u64)], vec![Element::from(q, 32u64)]
             ]
         )
     }
 
-    fn gen_vec_3() -> Vec<u64> {
-        vec![1u64, 2u64, 3u64]
+    fn gen_vec_3() -> Vec<Element> {
+        let q = gen_q();
+        vec![
+            Element::from(q, 1u64),
+            Element::from(q, 2u64),
+            Element::from(q, 3u64),
+        ]
     }
 
     #[test]
     fn test_indices() {
+        let q = gen_q();
         let mut m = gen_matrix_3_2();
-        assert_eq!(m[0][0], 1u64);
-        assert_eq!(m[0][1], 2u64);
-        assert_eq!(m[1][1], 5u64);
+        assert_eq!(m[0][0], Element::from(q, 1u64));
+        assert_eq!(m[0][1], Element::from(q, 2u64));
+        assert_eq!(m[1][1], Element::from(q, 5u64));
 
-        m[1][1] = 0u64;
-        assert_eq!(m[1][1], 0u64);
+        m[1][1] = Element::from(q, 0u64);
+        assert_eq!(m[1][1], Element::from(q, 0u64));
     }
 
     #[test]
@@ -324,7 +341,7 @@ mod tests {
         
         for (i, row) in o.data.iter().enumerate() {
             for (j, val) in row.iter().enumerate() {
-                assert_eq!(*val, &m[i][j] + &n[i][j]);
+                assert_eq!(*val, m[i][j].clone() + n[i][j].clone());
             }
         }
     }
@@ -338,7 +355,7 @@ mod tests {
         
         for (i, row) in m.data.iter().enumerate() {
             for (j, val) in row.iter().enumerate() {
-                assert_eq!(*val, &o[i][j] + &n[i][j]);
+                assert_eq!(*val, o[i][j].clone() + n[i][j].clone());
             }
         }
     }
