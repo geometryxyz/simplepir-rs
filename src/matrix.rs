@@ -58,10 +58,18 @@ impl Matrix {
     }
 
     /// Initialise a matrix from Vectors of Vectors of elements
-    pub fn from(data: Vec<Vec<Element>>) -> Self {
+    pub fn from(data: &Vec<Vec<Element>>) -> Self {
         let mut matrix = Self::new();
-        matrix.data = data;
+        matrix.data = data.clone();
         matrix
+    }
+
+    pub fn from_single(elem: &Element) -> Self {
+        Self::from(&vec![vec![elem.clone()]])
+    }
+
+    pub fn from_col(col: &Vec<Element>) -> Self {
+        Self::from(&vec![col.clone()])
     }
 
     pub fn push(&mut self, row: Vec<Element>) {
@@ -85,11 +93,11 @@ impl Matrix {
                 rotated[j][i] = self.data[i][j].clone();
             }
         }
-        Self::from(rotated)
+        Self::from(&rotated)
     }
 
-    pub fn mul_vec(self, rhs: Vec<Element>) -> Self {
-        let rhs_matrix = Self::from(vec![rhs]).rotated();
+    pub fn mul_vec(self, rhs: &Vec<Element>) -> Self {
+        let rhs_matrix = Self::from(&vec![rhs.clone()]).rotated();
         self.mul(rhs_matrix)
     }
 
@@ -197,7 +205,7 @@ impl Mul for Matrix {
             }
         }
 
-        Self::from(result)
+        Self::from(&result)
     }
 }
 
@@ -240,7 +248,7 @@ mod tests {
         let q = gen_q();
         // 3 rows, 2 cols
         Matrix::from(
-            vec![
+            &vec![
                 vec![Element::from(q, 1u64), Element::from(q, 2u64), Element::from(q, 3u64)],
                 vec![Element::from(q, 4u64), Element::from(q, 5u64), Element::from(q, 6u64)],
             ]
@@ -251,7 +259,7 @@ mod tests {
         let q = gen_q();
         // 2 rows, 3 cols
         Matrix::from(
-            vec![
+            &vec![
                 vec![Element::from(q, 1u64), Element::from(q, 4u64)],
                 vec![Element::from(q, 2u64), Element::from(q, 5u64)],
                 vec![Element::from(q, 3u64), Element::from(q, 6u64)],
@@ -263,7 +271,7 @@ mod tests {
         let q = gen_q();
         // 2 rows, 2 cols
         Matrix::from(
-            vec![
+            &vec![
                 vec![Element::from(q, 14u64), Element::from(q, 32u64)],
                 vec![Element::from(q, 32u64), Element::from(q, 77u64)],
             ]
@@ -274,7 +282,7 @@ mod tests {
         let q = gen_q();
         // 1 rows, 2 cols
         Matrix::from(
-            vec![
+            &vec![
                 vec![Element::from(q, 14u64)], vec![Element::from(q, 32u64)]
             ]
         )
@@ -330,7 +338,7 @@ mod tests {
         let m = gen_matrix_3_2();
         let v = gen_vec_3();
         let r = gen_matrix_1_2();
-        assert_eq!(m.mul_vec(v), r);
+        assert_eq!(m.mul_vec(&v), r);
     }
 
     #[test]

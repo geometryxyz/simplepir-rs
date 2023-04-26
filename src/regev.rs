@@ -18,17 +18,13 @@ pub struct Params {
 
 pub fn simple_params() -> Params {
     Params {
-        a: Matrix::from(
-            vec![
-                vec![
-                    // Make sure the modulus q is the same as below
-                    Element::from(3329u64, 604),
-                    Element::from(3329u64, 735),
-                    Element::from(3329u64, 3216),
-                    Element::from(3329u64, 1804),
-                ],
-            ]
-       ),
+        a: Matrix::from_col(&vec![
+           // Make sure the modulus q is the same as below!
+           Element::from(3329u64, 604),
+           Element::from(3329u64, 735),
+           Element::from(3329u64, 3216),
+           Element::from(3329u64, 1804),
+       ]),
         q: 3329,
         p: 2,
         n: 4,
@@ -37,44 +33,76 @@ pub fn simple_params() -> Params {
     }
 }
 
-pub fn encrypt(
-    params: Params,
-    secret: Vec<Element>,
-    e: Vec<Element>,
-    plaintext: Vec<Element>,
-) -> Matrix {
+fn check_secret_length(params: &Params, secret: &Vec<Element>) {
     // Check that the secret has the correct number of elements
     assert_eq!(secret.len(), params.n);
+}
 
-    // Check that the plaintext has the correct number of elements
-    assert_eq!(plaintext.len(), params.m);
-
+fn check_plaintext_mod(params: &Params, plaintext: &Element) {
     // Check that each element of the plaintext is within range
-    for c in &plaintext {
-        assert!(c.uint < params.q);
-    }
+    assert!(plaintext.uint < params.p);
+    assert_eq!(plaintext.q, params.p);
+}
 
+fn check_ciphertext_mod(params: &Params, ciphertext: &Element) {
+    // Check that the ciphertext is in range
+    assert!(ciphertext.uint < params.q);
+}
+
+fn check_error_length(params: &Params, error: &Vec<Element>) {
     // Check that the error has the correct number of elements
-    assert_eq!(e.len(), params.m);
-    
+    assert_eq!(error.len(), params.m);
+}
+
+pub fn encrypt(
+    params: &Params,
+    secret: &Vec<Element>,
+    e: &Vec<Element>,
+    plaintext: &Element,
+) -> Element {
+    check_secret_length(params, secret);
+    check_plaintext_mod(params, plaintext);
+    check_error_length(params, e);
+
     // Compute As
-    let a_s = params.a.mul_vec(secret);
+    let a_s = params.a.clone().mul_vec(secret);
     
     // Compute As + e
-    let a_s_e = a_s + Matrix::from(vec![e]);
+    let a_s_e = a_s + Matrix::from(&vec![e.clone()]);
     //println!("As + e: {}", a_s_e);
 
     let floor = params.q / params.p;
-    let floor = Matrix::from(vec![vec![Element::from(params.q, floor)]]);
+    let floor = Matrix::from_single(&Element::from(params.q, floor));
 
     // Convert the plaintext to a matrix with Element mod q instead of p
-    let plaintext_as_matrix = Matrix::from(vec![vec![Element::from(params.q, plaintext[0].uint)]]);
+    let plaintext_as_matrix = Matrix::from_single(&Element::from(params.q, plaintext.uint));
     //println!("plaintext_as_matrix: {}", plaintext_as_matrix.clone());
 
     // Compute the ciphertext
     let c = a_s_e + (floor * plaintext_as_matrix);
     
-    c
+    c[0][0].clone()
+}
+
+pub fn decrypt(
+    params: &Params,
+    secret: &Vec<Element>,
+    ciphertext: &Element,
+) -> Element {
+    check_secret_length(params, secret);
+    check_ciphertext_mod(params, ciphertext);
+    // Compute As
+    let a_s = params.a.clone().mul_vec(secret);
+
+    assert_eq!(ciphertext.q, params.q);
+    assert_eq!(a_s[0][0].q, params.q);
+
+    // Compute c - As
+    let c_a_s = Matrix::from_single(ciphertext) - a_s;
+
+    let x = ((c_a_s[0][0].uint * 2) / params.q) % params.p;
+
+    Element::from(params.p, x)
 }
 
 pub fn gen_random_normal_matrix(
@@ -88,7 +116,7 @@ pub fn gen_random_normal_matrix(
         num_cols
     ];
 
-    let mut matrix = Matrix::from(v);
+    let mut matrix = Matrix::from(&v);
 
     for i in 0..num_cols {
         for j in 0..num_rows {
@@ -120,13 +148,19 @@ pub mod tests {
         assert_eq!(matrix.num_cols(), num_cols);
     }
 
-    #[test]
-    fn test_encrypt() {
+    fn test_encrypt_and_decrypt_impl(pu: u64) {
         let params = simple_params();
         let secret = gen_secret(&params);
         let e = vec![Element::from(params.q, 2)];
-        let plaintext = vec![Element::from(params.p, 1)];
-        let ciphertext = encrypt(params, secret, e, plaintext);
-        println!("Ciphertext: {}", ciphertext);
+
+        let plaintext = Element::from(params.p, pu);
+        let ciphertext = encrypt(&params, &secret, &e, &plaintext);
+        assert_eq!(plaintext, decrypt(&params, &secret, &ciphertext));
+    }
+
+    #[test]
+    fn test_encrypt_and_decrypt() {
+        test_encrypt_and_decrypt_impl(0);
+        test_encrypt_and_decrypt_impl(1);
     }
 }
