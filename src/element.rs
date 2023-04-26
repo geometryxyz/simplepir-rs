@@ -5,6 +5,7 @@ use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
 use rand_distr::{Normal, Distribution};
 use std::cmp::{Ordering, PartialOrd};
 use rand::{
+    RngCore,
     rngs::StdRng,
     SeedableRng,
 };
@@ -25,7 +26,7 @@ impl Element {
 
     pub fn from(q: u64, uint: u64) -> Self {
         assert!(q < u64::MAX);
-        assert!(uint < u64::MAX);
+        assert!(uint < q);
 
         Self { q, uint }
     }
@@ -43,7 +44,15 @@ impl Element {
 
         let mut rng = StdRng::from_entropy();
         let v = normal.sample(&mut rng) as u64;
+
         Self::from(q, v)
+    }
+
+    pub fn gen_uniform_rand(q: u64) -> Self  {
+        // TODO: need to prevent modulo bias!!
+        let mut rng = StdRng::from_entropy();
+        let r = rng.next_u64() % q;
+        Self::from(q, r)
     }
 }
 
@@ -182,7 +191,7 @@ mod tests {
 
     #[test]
     fn test_add() {
-        let f = Element::from(gen_q(), 101u64);
+        let f = Element::from(gen_q(), 0u64);
         let g = Element::from(gen_q(), 1u64);
         let r = f + g;
         assert_eq!(r.uint, 1u64);
@@ -195,7 +204,7 @@ mod tests {
 
     #[test]
     fn test_add_assign() {
-        let mut f = Element::from(gen_q(), 101u64);
+        let mut f = Element::from(gen_q(), 0u64);
         let g = Element::from(gen_q(), 1u64);
         f += g;
         assert_eq!(f.uint, 1u64);
@@ -211,7 +220,7 @@ mod tests {
 
     #[test]
     fn test_sub_assign() {
-        let mut f = Element::from(gen_q(), 101u64);
+        let mut f = Element::from(gen_q(), 0u64);
         let g = Element::from(gen_q(), 1u64);
         f -= g;
         assert_eq!(f.uint, 100u64);
@@ -219,7 +228,7 @@ mod tests {
 
     #[test]
     fn test_mul() {
-        let f = Element::from(gen_q(), 101u64);
+        let f = Element::from(gen_q(), 0u64);
         let g = Element::from(gen_q(), 2u64);
         let r = f * g;
         assert_eq!(r.uint, 0u64);

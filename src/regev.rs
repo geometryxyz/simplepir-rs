@@ -17,20 +17,22 @@ pub struct Params {
 }
 
 pub fn simple_params() -> Params {
-    Params {
-        a: Matrix::from_col(&vec![
-           // Make sure the modulus q is the same as below!
-           Element::from(3329u64, 604),
-           Element::from(3329u64, 735),
-           Element::from(3329u64, 3216),
-           Element::from(3329u64, 1804),
-       ]),
-        q: 3329,
-        p: 2,
-        n: 4,
-        m: 1,
-        std_dev: 1.0,
+    let m = 1;
+    let n = 4;
+    let q = 3329;
+    let p = 2;
+    let std_dev = 6.4;
+    let mut a = Matrix::from(&Vec::with_capacity(m));
+
+    for _ in 0..m {
+        let mut row = Vec::with_capacity(n);
+        for _ in 0..n {
+            row.push(Element::gen_uniform_rand(q));
+        }
+        a.push(row);
     }
+
+    Params { a, q, p, n, m, std_dev }
 }
 
 fn check_secret_length(params: &Params, secret: &Vec<Element>) {
@@ -69,14 +71,12 @@ pub fn encrypt(
     
     // Compute As + e
     let a_s_e = a_s + Matrix::from(&vec![e.clone()]);
-    //println!("As + e: {}", a_s_e);
 
     let floor = params.q / params.p;
     let floor = Matrix::from_single(&Element::from(params.q, floor));
 
     // Convert the plaintext to a matrix with Element mod q instead of p
     let plaintext_as_matrix = Matrix::from_single(&Element::from(params.q, plaintext.uint));
-    //println!("plaintext_as_matrix: {}", plaintext_as_matrix.clone());
 
     // Compute the ciphertext
     let c = a_s_e + (floor * plaintext_as_matrix);
@@ -126,18 +126,28 @@ pub fn gen_random_normal_matrix(
     matrix
 }
 
+pub fn gen_secret(params: &Params) -> Vec<Element> {
+    let mut secret = Vec::with_capacity(params.n);
+    for _ in 0..params.n {
+        secret.push(Element::gen_uniform_rand(params.q));
+    }
+    secret
+}
+
+pub fn gen_error_vec(params: &Params) -> Vec<Element> {
+    let half_q_p = params.q / params.p / 2;
+    let mut error_vec = Vec::with_capacity(params.m);
+    for _ in 0..params.m {
+        let e = Element::gen_uniform_rand(half_q_p as u64);
+        let e = Element::from(params.q, e.uint);
+        error_vec.push(e);
+    }
+    error_vec
+}
+
 #[cfg(test)]
 pub mod tests {
     use super::*;
-
-    fn gen_secret(params: &Params) -> Vec<Element> {
-        vec![
-            Element::from(params.q, 1503),
-            Element::from(params.q, 1137),
-            Element::from(params.q, 738),
-            Element::from(params.q, 1775),
-        ]
-    }
 
     #[test]
     fn test_gen_random_normal_matrix() {
@@ -151,7 +161,7 @@ pub mod tests {
     fn test_encrypt_and_decrypt_impl(pu: u64) {
         let params = simple_params();
         let secret = gen_secret(&params);
-        let e = vec![Element::from(params.q, 2)];
+        let e = gen_error_vec(&params);
 
         let plaintext = Element::from(params.p, pu);
         let ciphertext = encrypt(&params, &secret, &e, &plaintext);
@@ -162,5 +172,23 @@ pub mod tests {
     fn test_encrypt_and_decrypt() {
         test_encrypt_and_decrypt_impl(0);
         test_encrypt_and_decrypt_impl(1);
+    }
+
+    #[test]
+    fn test_ciphertext_homomorphism() {
+        let mut params = simple_params();
+        let secret = gen_secret(&params);
+        let e = gen_error_vec(&params);
+
+        let plaintext_0 = Element::from(params.p, 0);
+        let ciphertext_0 = encrypt(&params, &secret, &e, &plaintext_0);
+        let plaintext_1 = Element::from(params.p, 1);
+        let ciphertext_1 = encrypt(&params, &secret, &e, &plaintext_1);
+
+        let a_n = params.a.clone() + params.a.clone();
+        params.a = a_n;
+        let ciphertext_n = ciphertext_0 + ciphertext_1;
+        let plaintext_n = plaintext_0 + plaintext_1;
+        assert_eq!(plaintext_n, decrypt(&params, &secret, &ciphertext_n));
     }
 }
