@@ -1,6 +1,7 @@
 use crate::matrix::Matrix;
 use crate::element::Element;
 
+#[derive(Debug, PartialEq, Clone)]
 pub struct Params {
     // Public A matrix
     pub a: Matrix,
@@ -18,12 +19,12 @@ pub struct Params {
 
 pub fn simple_params() -> Params {
     let m = 1;
-    let n = 4;
+    let n = 512;
     let q = 3329;
     let p = 2;
     let std_dev = 6.4;
-    let mut a = Matrix::from(&Vec::with_capacity(m));
 
+    let mut a = Vec::with_capacity(m);
     for _ in 0..m {
         let mut row = Vec::with_capacity(n);
         for _ in 0..n {
@@ -31,6 +32,7 @@ pub fn simple_params() -> Params {
         }
         a.push(row);
     }
+    let a = Matrix::from(&a);
 
     Params { a, q, p, n, m, std_dev }
 }
@@ -65,12 +67,13 @@ pub fn encrypt(
     check_secret_length(params, secret);
     check_plaintext_mod(params, plaintext);
     check_error_length(params, e);
+    // TODO: check error range
 
     // Compute As
     let a_s = params.a.clone().mul_vec(secret);
     
     // Compute As + e
-    let a_s_e = a_s + Matrix::from(&vec![e.clone()]);
+    let b = a_s + Matrix::from(&vec![e.clone()]);
 
     let floor = params.q / params.p;
     let floor = Matrix::from_single(&Element::from(params.q, floor));
@@ -79,7 +82,7 @@ pub fn encrypt(
     let plaintext_as_matrix = Matrix::from_single(&Element::from(params.q, plaintext.uint));
 
     // Compute the ciphertext
-    let c = a_s_e + (floor * plaintext_as_matrix);
+    let c = b + (floor * plaintext_as_matrix);
     
     c[0][0].clone()
 }
@@ -98,9 +101,10 @@ pub fn decrypt(
     assert_eq!(a_s[0][0].q, params.q);
 
     // Compute c - As
-    let c_a_s = Matrix::from_single(ciphertext) - a_s;
+    let raw = Matrix::from_single(ciphertext) - a_s;
+    //println!("raw * 2 / q: {}", ((raw[0][0].uint * 2) as f64 / params.q as f64).round() as u64 % params.p);
 
-    let x = ((c_a_s[0][0].uint * 2) / params.q) % params.p;
+    let x = ((raw[0][0].uint * 2) as f64 / params.q as f64).round() as u64 % params.p;
 
     Element::from(params.p, x)
 }
@@ -135,11 +139,13 @@ pub fn gen_secret(params: &Params) -> Vec<Element> {
 }
 
 pub fn gen_error_vec(params: &Params) -> Vec<Element> {
-    let half_q_p = params.q / params.p / 2;
+    let sample_space = params.q / params.p / 2;
+    let half_sample_space = sample_space / 2;
     let mut error_vec = Vec::with_capacity(params.m);
     for _ in 0..params.m {
-        let e = Element::gen_uniform_rand(half_q_p as u64);
-        let e = Element::from(params.q, e.uint);
+        let rand = Element::gen_uniform_rand(sample_space);
+        let mut e = Element::from(params.q, rand.uint);
+        e -= Element::from(params.q, half_sample_space);
         error_vec.push(e);
     }
     error_vec
@@ -158,7 +164,7 @@ pub mod tests {
         assert_eq!(matrix.num_cols(), num_cols);
     }
 
-    fn test_encrypt_and_decrypt_impl(pu: u64) {
+    fn encrypt_and_decrypt_impl(pu: u64) {
         let params = simple_params();
         let secret = gen_secret(&params);
         let e = gen_error_vec(&params);
@@ -170,25 +176,38 @@ pub mod tests {
 
     #[test]
     fn test_encrypt_and_decrypt() {
-        test_encrypt_and_decrypt_impl(0);
-        test_encrypt_and_decrypt_impl(1);
+        for _ in 0..50 {
+            encrypt_and_decrypt_impl(0);
+            encrypt_and_decrypt_impl(1);
+        }
     }
 
-    #[test]
-    fn test_ciphertext_homomorphism() {
-        let mut params = simple_params();
+    fn homomorphic_addition_impl(params: &Params) {
         let secret = gen_secret(&params);
-        let e = gen_error_vec(&params);
+        let e_0 = gen_error_vec(&params);
+        let e_1 = gen_error_vec(&params);
 
         let plaintext_0 = Element::from(params.p, 0);
-        let ciphertext_0 = encrypt(&params, &secret, &e, &plaintext_0);
+        let ciphertext_0 = encrypt(&params, &secret, &e_0, &plaintext_0);
+
         let plaintext_1 = Element::from(params.p, 1);
-        let ciphertext_1 = encrypt(&params, &secret, &e, &plaintext_1);
+        let ciphertext_1 = encrypt(&params, &secret, &e_1, &plaintext_1);
 
         let a_n = params.a.clone() + params.a.clone();
+        let mut params = params.clone();
         params.a = a_n;
         let ciphertext_n = ciphertext_0 + ciphertext_1;
         let plaintext_n = plaintext_0 + plaintext_1;
         assert_eq!(plaintext_n, decrypt(&params, &secret, &ciphertext_n));
     }
+
+    #[test]
+    fn test_homomorphic_addition() {
+        let params = simple_params();
+        for _ in 0..50 {
+            homomorphic_addition_impl(&params);
+        }
+    }
+
+    // Homomorphic multiplication isn't needed for bits
 }

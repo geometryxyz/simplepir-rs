@@ -65,8 +65,8 @@ impl PartialOrd for Element {
 impl Clone for Element {
     fn clone(&self) -> Self {
         Self {
-            uint: self.uint.clone(),
-            q: self.q.clone(),
+            uint: self.uint,
+            q: self.q,
         }
     }
 
@@ -81,7 +81,7 @@ impl Mul for Element {
     fn mul(self, rhs: Element) -> Self::Output {
         assert_eq!(self.q, rhs.q);
         Self {
-            q: self.q.clone(),
+            q: self.q,
             uint: (self.uint * rhs.uint) % self.q,
         }
     }
@@ -91,15 +91,15 @@ impl MulAssign for Element {
     fn mul_assign(&mut self, rhs: Self) {
         assert_eq!(self.q, rhs.q);
         *self = Self {
-            q: self.q.clone(),
-            uint: (self.uint.clone() * rhs.uint) % self.q.clone(),
+            q: self.q,
+            uint: (self.uint * rhs.uint) % self.q,
         }
     }
 }
 
 impl ZeroQ for Element {
     fn zero(q: u64) -> Self {
-        return Element {
+        Element {
             q,
             uint: 0u64,
         }
@@ -115,7 +115,7 @@ impl Add for Element {
     fn add(self, rhs: Self) -> Self::Output {
         assert_eq!(self.q, rhs.q);
         Self {
-            q: self.q.clone(),
+            q: self.q,
             uint: (self.uint + rhs.uint) % self.q,
         }
     }
@@ -125,8 +125,8 @@ impl AddAssign for Element {
     fn add_assign(&mut self, rhs: Self) {
         assert_eq!(self.q, rhs.q);
         *self = Self {
-            q: self.q.clone(),
-            uint: (self.uint.clone() + rhs.uint) % self.q.clone(),
+            q: self.q,
+            uint: (self.uint + rhs.uint) % self.q,
         }
     }
 }
@@ -138,13 +138,13 @@ impl Sub for Element {
         if self.uint < other.uint {
             let d = other.uint - self.uint;
             return Self {
-                q: self.q.clone(),
+                q: self.q,
                 uint: self.q - d,
             };
         }
 
         Self {
-            q: self.q.clone(),
+            q: self.q,
             uint: self.uint - other.uint,
         }
     }
@@ -154,15 +154,15 @@ impl SubAssign for Element {
     fn sub_assign(&mut self, other: Self) {
         assert_eq!(self.q, other.q);
         if self.uint < other.uint {
-            let d = other.uint - &self.uint;
+            let d = other.uint - self.uint;
             *self = Self {
-                q: self.q.clone(),
-                uint: &self.q - d,
+                q: self.q,
+                uint: self.q - d,
             }
         } else {
             *self = Self {
-                q: self.q.clone(),
-                uint: self.uint.clone() - other.uint,
+                q: self.q,
+                uint: self.uint - other.uint,
             }
         }
     }

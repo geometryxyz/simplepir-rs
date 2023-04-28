@@ -60,7 +60,7 @@ impl Matrix {
     /// Initialise a matrix from Vectors of Vectors of elements
     pub fn from(data: &Vec<Vec<Element>>) -> Self {
         let mut matrix = Self::new();
-        matrix.data = data.clone();
+        matrix.data = data.to_owned();
         matrix
     }
 
@@ -69,7 +69,7 @@ impl Matrix {
     }
 
     pub fn from_col(col: &Vec<Element>) -> Self {
-        Self::from(&vec![col.clone()])
+        Self::from(&vec![col.to_owned()])
     }
 
     pub fn push(&mut self, row: Vec<Element>) {
@@ -96,8 +96,19 @@ impl Matrix {
         Self::from(&rotated)
     }
 
+    pub fn mul_elem(self, rhs: &Element) -> Self {
+        let mut r = self.clone();
+        for i in 0..self.num_cols() {
+            for j in 0..self.num_rows() {
+                r[i][j] *= rhs.clone();
+            }
+        }
+
+        r
+    }
+
     pub fn mul_vec(self, rhs: &Vec<Element>) -> Self {
-        let rhs_matrix = Self::from(&vec![rhs.clone()]).rotated();
+        let rhs_matrix = Self::from(&vec![rhs.to_owned()]).rotated();
         self.mul(rhs_matrix)
     }
 
@@ -228,8 +239,8 @@ impl Display for Matrix {
                 }
             }
             write!(f, "]")?;
-            write!(f, "\n")?;
         }
+        write!(f, "\n")?;
         Ok(())
     }
 }
@@ -318,8 +329,11 @@ mod tests {
 
     #[test]
     fn test_mul() {
+        // 3 rows, 2 cols
         let m = gen_matrix_3_2();
+        // 2 rows, 3 cols
         let n = gen_matrix_2_3();
+        // Should have 3 rows and 3 columns
         let o = gen_matrix_2_2();
         assert_eq!(m * n, o);
     }
