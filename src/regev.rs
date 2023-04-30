@@ -1,3 +1,4 @@
+use crate::zeroq::ZeroQ;
 use crate::matrix::Matrix;
 use crate::element::Element;
 
@@ -72,7 +73,7 @@ pub fn encrypt(
     // Compute As
     let a_s = params.a.clone().mul_vec(secret);
     
-    // Compute As + e
+    // Compute b = As + e
     let b = a_s + Matrix::from(&vec![e.clone()]);
 
     let floor = params.q / params.p;
@@ -81,7 +82,7 @@ pub fn encrypt(
     // Convert the plaintext to a matrix with Element mod q instead of p
     let plaintext_as_matrix = Matrix::from_single(&Element::from(params.q, plaintext.uint));
 
-    // Compute the ciphertext
+    // Compute the ciphertext As + e + round(q / p) * plaintext
     let c = b + (floor * plaintext_as_matrix);
     
     c[0][0].clone()
@@ -139,7 +140,7 @@ pub fn gen_secret(params: &Params) -> Vec<Element> {
 }
 
 pub fn gen_error_vec(params: &Params) -> Vec<Element> {
-    let sample_space = params.q / params.p / 2;
+    let sample_space = 6;
     let half_sample_space = sample_space / 2;
     let mut error_vec = Vec::with_capacity(params.m);
     for _ in 0..params.m {
@@ -151,9 +152,91 @@ pub fn gen_error_vec(params: &Params) -> Vec<Element> {
     error_vec
 }
 
+pub fn gen_db(db_size: usize) -> Vec<Element> {
+    let mut db = Vec::with_capacity(db_size);
+    for _ in 0..db_size {
+        let val = Element::gen_uniform_rand(2);
+        db.push(val);
+    }
+    db
+}
+
+pub fn query(
+    params: &Params,
+    idx: usize,
+    s: &Vec<Element>,
+    db_size: usize,
+) -> Vec<Element> {
+    assert!(idx < db_size);
+    let mut query = Vec::with_capacity(db_size);
+    for i in 0..db_size {
+        let bit;
+        if i == idx {
+            bit = 1;
+        } else {
+            bit = 0;
+        }
+        let e = gen_error_vec(params);
+        let enc = encrypt(
+            params,
+            s,
+            &e,
+            &Element::from(params.p, bit)
+        );
+        query.push(enc);
+    }
+    query
+}
+
+pub fn answer(params: &Params, query: &Vec<Element>, db: &Vec<Element>) ->
+    (Matrix, Element)
+{
+    let zero = Element::zero(params.q);
+    let row = vec![zero; params.n];
+    let cols = vec![row; params.m];
+    let mut summed_a = Matrix::from(&cols);
+    let mut summed_c = Element::zero(params.q);
+
+    for (i, item) in db.iter().enumerate() {
+        if item.uint == 1 {
+            summed_a += params.a.clone();
+            summed_c += query[i].clone();
+        }
+    }
+    (summed_a, summed_c)
+}
+
 #[cfg(test)]
 pub mod tests {
     use super::*;
+
+    fn test_pir_impl(
+        params: &Params,
+        s: &Vec<Element>,
+    ) {
+        let db_size = 50;
+        let db = gen_db(db_size);
+
+        let desired_idx = 24;
+        let query = query(&params, desired_idx, &s, db_size);
+
+        let answer = answer(&params, &query, &db);
+
+        // Decrypt the answer
+        let mut params_2 = params.clone();
+        params_2.a = answer.0;
+        let result = decrypt(&params_2, &s, &answer.1);
+        assert_eq!(result, db[desired_idx]);
+    }
+
+    #[test]
+    fn test_pir() {
+        let params = simple_params();
+        let s = gen_secret(&params);
+        for _ in 0..50 {
+            test_pir_impl(&params, &s);
+        }
+    }
 
     #[test]
     fn test_gen_random_normal_matrix() {

@@ -48,6 +48,8 @@ impl Element {
         Self::from(q, v)
     }
 
+    /// Generate a random element using a uniform distribution.
+    /// The value will be an Element mod q.
     pub fn gen_uniform_rand(q: u64) -> Self  {
         // TODO: need to prevent modulo bias!!
         let mut rng = StdRng::from_entropy();
