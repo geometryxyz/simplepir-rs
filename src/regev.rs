@@ -1,4 +1,3 @@
-use crate::zeroq::ZeroQ;
 use crate::matrix::Matrix;
 use crate::element::Element;
 
@@ -25,15 +24,7 @@ pub fn simple_params() -> Params {
     let p = 2;
     let std_dev = 6.4;
 
-    let mut a = Vec::with_capacity(m);
-    for _ in 0..m {
-        let mut row = Vec::with_capacity(n);
-        for _ in 0..n {
-            row.push(Element::gen_uniform_rand(q));
-        }
-        a.push(row);
-    }
-    let a = Matrix::from(&a);
+    let a = Matrix::gen_uniform_rand(q, n, m);
 
     Params { a, q, p, n, m, std_dev }
 }
@@ -103,9 +94,9 @@ pub fn decrypt(
 
     // Compute c - As
     let raw = Matrix::from_single(ciphertext) - a_s;
-    //println!("raw * 2 / q: {}", ((raw[0][0].uint * 2) as f64 / params.q as f64).round() as u64 % params.p);
 
-    let x = ((raw[0][0].uint * 2) as f64 / params.q as f64).round() as u64 % params.p;
+    // Round to the nearest q / p
+    let x = ((raw[0][0].uint * &params.p) as f64 / params.q as f64).round() as u64 % params.p;
 
     Element::from(params.p, x)
 }
@@ -152,91 +143,9 @@ pub fn gen_error_vec(params: &Params) -> Vec<Element> {
     error_vec
 }
 
-pub fn gen_db(db_size: usize) -> Vec<Element> {
-    let mut db = Vec::with_capacity(db_size);
-    for _ in 0..db_size {
-        let val = Element::gen_uniform_rand(2);
-        db.push(val);
-    }
-    db
-}
-
-pub fn query(
-    params: &Params,
-    idx: usize,
-    s: &Vec<Element>,
-    db_size: usize,
-) -> Vec<Element> {
-    assert!(idx < db_size);
-    let mut query = Vec::with_capacity(db_size);
-    for i in 0..db_size {
-        let bit;
-        if i == idx {
-            bit = 1;
-        } else {
-            bit = 0;
-        }
-        let e = gen_error_vec(params);
-        let enc = encrypt(
-            params,
-            s,
-            &e,
-            &Element::from(params.p, bit)
-        );
-        query.push(enc);
-    }
-    query
-}
-
-pub fn answer(params: &Params, query: &Vec<Element>, db: &Vec<Element>) ->
-    (Matrix, Element)
-{
-    let zero = Element::zero(params.q);
-    let row = vec![zero; params.n];
-    let cols = vec![row; params.m];
-    let mut summed_a = Matrix::from(&cols);
-    let mut summed_c = Element::zero(params.q);
-
-    for (i, item) in db.iter().enumerate() {
-        if item.uint == 1 {
-            summed_a += params.a.clone();
-            summed_c += query[i].clone();
-        }
-    }
-    (summed_a, summed_c)
-}
-
 #[cfg(test)]
 pub mod tests {
     use super::*;
-
-    fn test_pir_impl(
-        params: &Params,
-        s: &Vec<Element>,
-    ) {
-        let db_size = 50;
-        let db = gen_db(db_size);
-
-        let desired_idx = 24;
-        let query = query(&params, desired_idx, &s, db_size);
-
-        let answer = answer(&params, &query, &db);
-
-        // Decrypt the answer
-        let mut params_2 = params.clone();
-        params_2.a = answer.0;
-        let result = decrypt(&params_2, &s, &answer.1);
-        assert_eq!(result, db[desired_idx]);
-    }
-
-    #[test]
-    fn test_pir() {
-        let params = simple_params();
-        let s = gen_secret(&params);
-        for _ in 0..50 {
-            test_pir_impl(&params, &s);
-        }
-    }
 
     #[test]
     fn test_gen_random_normal_matrix() {
@@ -292,5 +201,41 @@ pub mod tests {
         }
     }
 
-    // Homomorphic multiplication isn't needed for bits
+    fn test_homomorphic_multiplication_impl() {
+        let mut params = simple_params();
+        params.p = 3;
+        let secret = gen_secret(&params);
+        let e = gen_error_vec(&params);
+
+        // Encrypt and decrypt the value 1 mod 3
+        let plaintext_1 = Element::from(params.p, 1);
+        let ciphertext_1 = encrypt(&params, &secret, &e, &plaintext_1);
+
+        let decryption_1 = decrypt(&params, &secret, &ciphertext_1);
+        assert_eq!(decryption_1, plaintext_1);
+
+        // two = 2 mod 3
+        let two = Element::from(params.q, 2);
+
+        // Encrypt 1 * 2
+        let ciphertext_2 = ciphertext_1 * two.to_owned();
+        let mut params_2 = params.clone();
+        params_2.a = params.a.mul_elem(&two);
+
+        let result = decrypt(&params_2, &secret, &ciphertext_2);
+        assert_eq!(
+            Element::from(
+                params.p, 
+                plaintext_1.uint * two.uint % params.p
+            ),
+            result
+        );
+    }
+
+    #[test]
+    fn test_homomorphic_multiplication() {
+        for _ in 0..100 {
+            test_homomorphic_multiplication_impl();
+        }
+    }
 }

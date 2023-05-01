@@ -1,4 +1,3 @@
-use crate::zeroq::ZeroQ;
 use crate::element::Element;
 use std::clone::Clone;
 use std::default::Default;
@@ -72,6 +71,24 @@ impl Matrix {
         Self::from(&vec![col.to_owned()])
     }
 
+    pub fn from_val(rows: usize, cols: usize, val: Element) -> Self {
+        let row = vec![val; cols];
+        let cols = vec![row; rows];
+        Matrix::from(&cols)
+    }
+
+    pub fn gen_uniform_rand(q: u64, rows: usize, cols: usize) -> Self  {
+        let mut a = Vec::with_capacity(cols);
+        for _ in 0..cols {
+            let mut row = Vec::with_capacity(rows);
+            for _ in 0..rows {
+                row.push(Element::gen_uniform_rand(q));
+            }
+            a.push(row);
+        }
+        Matrix::from(&a)
+    }
+
     pub fn push(&mut self, row: Vec<Element>) {
         self.data.push(row);
     }
@@ -100,7 +117,7 @@ impl Matrix {
         let mut r = self.clone();
         for i in 0..self.num_cols() {
             for j in 0..self.num_rows() {
-                r[i][j] *= rhs.clone();
+                r[i][j] *= rhs.to_owned();
             }
         }
 
@@ -246,7 +263,7 @@ impl Display for Matrix {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::Matrix;
     use super::Element;
 

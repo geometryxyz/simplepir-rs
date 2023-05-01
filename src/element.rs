@@ -1,4 +1,3 @@
-use crate::zeroq::ZeroQ;
 use rand_distr::num_traits::Zero;
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
@@ -31,6 +30,17 @@ impl Element {
         Self { q, uint }
     }
 
+    pub fn zero(q: u64) -> Self {
+        Element {
+            q,
+            uint: 0u64,
+        }
+    }
+
+    pub fn is_zero(&self) -> bool {
+        self.uint == 0u64
+    }
+
     /// Generate a random Element following a normal (Gaussian) distribution.
     ///
     /// # Parameters 
@@ -51,10 +61,16 @@ impl Element {
     /// Generate a random element using a uniform distribution.
     /// The value will be an Element mod q.
     pub fn gen_uniform_rand(q: u64) -> Self  {
-        // TODO: need to prevent modulo bias!!
         let mut rng = StdRng::from_entropy();
-        let r = rng.next_u64() % q;
-        Self::from(q, r)
+        let min = (u64::MAX - q) % q;
+        let mut r;
+        loop {
+            r = rng.next_u64();
+            if r >= min {
+                break
+            }
+        }
+        Self::from(q, r % q)
     }
 }
 
@@ -96,19 +112,6 @@ impl MulAssign for Element {
             q: self.q,
             uint: (self.uint * rhs.uint) % self.q,
         }
-    }
-}
-
-impl ZeroQ for Element {
-    fn zero(q: u64) -> Self {
-        Element {
-            q,
-            uint: 0u64,
-        }
-    }
-
-    fn is_zero(&self) -> bool {
-        self.uint == 0u64
     }
 }
 
@@ -177,7 +180,7 @@ impl Display for Element {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::Element;
 
     fn gen_q() -> u64 {
