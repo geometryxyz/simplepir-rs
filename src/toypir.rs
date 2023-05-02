@@ -83,12 +83,10 @@ pub fn answer(params: &Params, query: &[Element], db: &[Element]) ->
 /// Return an answer to a private query using a much less efficient method though it is closer to
 /// what is described in the SimplePIR paper. In this technique, for each i-th database entry, we
 /// take each ciphertext in the query (A, c) and multiply it by db[i].
-/// e.g. query = [enc(0), enc(1)]
-///         db = [1, 2]
-///
-///     answer = enc(0 * 1) + enc(1 * 2) = enc(2)
-///
-///
+/// e.g:
+/// query = [enc(0), enc(1)]
+/// db = [1, 2]
+/// answer = enc(0 * 1) + enc(1 * 2) = enc(2)
 pub fn answer_q(params: &Params, query: &[Element], db: &[Element]) -> 
     (Matrix, Element)
 {

@@ -62,10 +62,10 @@ pub fn encrypt(
     // TODO: check error range
 
     // Compute As
-    let a_s = params.a.clone().mul_vec(secret);
-    
+    let a_s = params.a.to_owned().mul_vec(secret);
+
     // Compute b = As + e
-    let b = a_s + Matrix::from(&vec![e.clone()]);
+    let b = a_s + Matrix::from(&vec![e.clone()]).rotated();
 
     let floor = params.q / params.p;
     let floor = Matrix::from_single(&Element::from(params.q, floor));
