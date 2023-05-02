@@ -93,6 +93,14 @@ impl Matrix {
         self.data.push(row);
     }
 
+    pub fn change_q(&mut self, new_q: u64) {
+        for i in 0..self.num_cols() {
+            for j in 0..self.num_rows() {
+                self[i][j].q = new_q;
+            }
+        }
+    }
+
     pub fn num_vals(&self) -> usize {
         if !self.data.is_empty() {
             return self.data.len() * self.data[0].len();

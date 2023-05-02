@@ -37,11 +37,7 @@ pub fn gen_db(params: &SimplePIRParams) -> Matrix {
 
 pub fn gen_hint(params: &SimplePIRParams, db: &Matrix) -> Matrix {
     let mut db_q = db.clone();
-    for i in 0..db_q.num_cols() {
-        for j in 0..db_q.num_rows() {
-            db_q[i][j].q = params.regev_params.q;
-        }
-    }
+    db_q.change_q(params.regev_params.q);
     db_q.to_owned() * params.regev_params.a.to_owned()
 }
 
@@ -98,14 +94,10 @@ mod tests {
     use super::*;
     use crate::regev::gen_secret;
 
-    fn test_simplepir_impl() {
+    fn test_simplepir_impl(desired_col: usize, desired_row: usize) {
         let params = gen_params();
         let db = gen_db(&params);
 
-        let desired_row = 1;
-        let desired_col = 2;
-
-        // TODO: check if it should be col, row or row, col
         let db_item = &db[desired_col][desired_row];
 
         let secret = gen_secret(&params.regev_params);
@@ -119,8 +111,62 @@ mod tests {
 
     #[test]
     pub fn test_simplepir() {
-        for _ in 0..50 {
-            test_simplepir_impl();
+        for i in 0..8 {
+            for j in 0..8 {
+                test_simplepir_impl(i, j);
+            }
+        }
+    }
+
+    fn test_simplepir_updates_impl(desired_col: usize, desired_row: usize) {
+        let params = gen_params();
+        let db = gen_db(&params);
+        let hint = gen_hint(&params, &db);
+
+        let secret = gen_secret(&params.regev_params);
+
+        let query = query(&params, desired_row, &secret);
+        let ans = answer(&query, &db);
+        let recovered = recover(&params, &secret, desired_col, &hint, &ans);
+
+        let db_item = &db[desired_col][desired_row];
+        assert_eq!(recovered, *db_item);
+
+        // Flip all bits of one row
+        let mut db = db.clone();
+
+        let mut updated_row = Vec::with_capacity(params.log2_db_size);
+        for i in 0..db.num_rows() {
+            // Flip the bits in the row
+            db[desired_col][i] -= Element::from(params.regev_params.p, 1);
+            updated_row.push(
+                Element::from(params.regev_params.q, db[desired_col][i].uint)
+            );
+        }
+        db.change_q(params.regev_params.q);
+
+        // Now update the hint
+        let mut hint = hint.clone();
+
+        // This operation is much more efficient than regenerating the whole hint matrix
+        let updated_hint_row = Matrix::from_col(&updated_row) * params.regev_params.a.to_owned();
+
+        for j in 0..hint.num_rows() {
+            hint[desired_col][j] = updated_hint_row[0][j].clone();
+        }
+
+        let ans = answer(&query, &db);
+        let recovered = recover(&params, &secret, desired_col, &hint, &ans);
+        let db_item = &db[desired_col][desired_row];
+        assert_eq!(recovered.uint, db_item.uint);
+    }
+
+    #[test]
+    pub fn test_simplepir_updates() {
+        for i in 0..8 {
+            for j in 0..8 {
+                test_simplepir_updates_impl(i, j);
+            }
         }
     }
 }
