@@ -77,6 +77,7 @@ impl Matrix {
         Matrix::from(&cols)
     }
 
+    // TODO: change all (rows, cols) to (cols, rows) for consistency with the paper
     pub fn gen_uniform_rand(q: u64, rows: usize, cols: usize) -> Self  {
         let mut a = Vec::with_capacity(cols);
         for _ in 0..cols {
@@ -89,8 +90,9 @@ impl Matrix {
         Matrix::from(&a)
     }
 
-    pub fn push(&mut self, row: Vec<Element>) {
-        self.data.push(row);
+    pub fn append_col(&mut self, col: Vec<Element>) {
+        assert_eq!(self.num_rows(), col.len());
+        self.data.push(col);
     }
 
     pub fn change_q(&mut self, new_q: u64) {
@@ -137,7 +139,59 @@ impl Matrix {
         self.mul(rhs_matrix)
     }
 
+    fn log_q_div_log_p_ceil(q: u64, p: u64) -> usize {
+        ((q - 1) as f64).log(p as f64).ceil() as usize
+    }
+
+    pub fn recompose(self, p: u64, q: u64) -> Self {
+        let num_digits = Self::log_q_div_log_p_ceil(q, p);
+        assert_eq!(self.num_cols() % num_digits, 0);
+
+        let each_col = vec![Element::from(q, 0); self.num_rows()];
+        let mut all_cols = vec![each_col.clone(); self.num_cols() / num_digits];
+
+        for i in 0..all_cols.len() {
+            for j in 0..each_col.len() {
+                let mut d = Vec::with_capacity(num_digits);
+                for k in 0..num_digits {
+                    d.push(self.data[i * num_digits + k][j].uint);
+                }
+                let d = Element::recompose(p, q, &d);
+                all_cols[i][j] = d;
+            }
+        }
+        Matrix::from(&all_cols)
+    }
+
+    pub fn decomposed(self, p: u64) -> Self {
+        if self.num_cols() == 0 {
+            return self;
+        }
+
+        let q = self.data[0][0].q;
+
+        let num_digits = Self::log_q_div_log_p_ceil(q, p);
+
+        let each_col = vec![Element::from(q, 0); self.num_rows()];
+        let mut all_cols = vec![each_col; num_digits * self.num_cols()];
+
+        // NOTE: this is slow!
+        for i in 0..self.num_cols() {
+            for j in 0..self.num_rows() {
+                let d = self.data[i][j].to_owned().decomposed(p);
+                for k in 0..num_digits {
+                    all_cols[i * num_digits + k][j].uint = d[k];
+                }
+            }
+        }
+        Self::from(&all_cols)
+    }
+
     pub fn num_rows(&self) -> usize {
+        if self.num_cols() == 0 {
+                return 0;
+        }
+
         self.data[0].len()
     }
 
@@ -146,7 +200,7 @@ impl Matrix {
     }
 
     pub fn dimensions(&self) -> (usize, usize) {
-        (self.num_rows(), self.num_cols())
+        (self.num_cols(), self.num_rows())
     }
 }
 
@@ -405,5 +459,42 @@ pub mod tests {
                 assert_eq!(*val, o[i][j].clone() + n[i][j].clone());
             }
         }
+    }
+
+    #[test]
+    fn test_matrix_decomposition() {
+        let m = gen_matrix_3_2();
+        let decomposed = m.to_owned().decomposed(2);
+        assert_eq!(decomposed.num_cols(), 14);
+        assert_eq!(decomposed.num_rows(), 3);
+        let expected = vec![
+            vec![1, 0, 1],
+            vec![0, 1, 1],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 1, 0],
+            vec![0, 0, 1],
+            vec![1, 1, 1],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+        ];
+        for (i, col) in decomposed.data.iter().enumerate() {
+            for j in 0..col.len() {
+                assert_eq!(col[j].uint, expected[i][j] as u64);
+            }
+        }
+    }
+
+    #[test]
+    fn test_matrix_recomposition() {
+        let m = gen_matrix_3_2();
+        let decomposed = m.to_owned().decomposed(2);
+        let r = decomposed.recompose(2, m[0][0].q);
+        assert_eq!(m, r);
     }
 }

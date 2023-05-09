@@ -1,60 +1,70 @@
 use crate::matrix::Matrix;
 use crate::element::Element;
-use crate::regev::{
-    Params,
-    gen_error_vec,
-};
+use crate::regev::gen_error_vec;
 
 pub struct SimplePIRParams {
-    pub log2_db_size: usize,
-    pub regev_params: Params,
+    // Public A matrix
+    pub a: Matrix,
+    // The integer modulus
+    pub q: u64,
+    // The plaintext modulus
+    pub p: u64,
+    // The LWE secret length
+    pub n: usize,
+    // The number of samples or the width of the (square) database
+    pub m: usize,
+    // The standard deviation for sampling random elements
+    pub std_dev: f64,
 }
 
 pub fn gen_params() -> SimplePIRParams {
-    let log2_db_size = 8;
     let m = 8;
-    let n = 512;
+    let n = 64;
     let q = 3329;
     let p = 2;
     let std_dev = 6.4;
     let a = Matrix::gen_uniform_rand(q, n, m);
 
-    let regev_params = Params { a, q, p, n, m, std_dev };
-
-    SimplePIRParams {
-        log2_db_size,
-        regev_params,
-    }
+    SimplePIRParams { a, q, p, n, m, std_dev }
 }
 
+/// Generate a database of random values mod the plaintext modulus p
 pub fn gen_db(params: &SimplePIRParams) -> Matrix {
     Matrix::gen_uniform_rand(
-        params.regev_params.p,
-        params.log2_db_size,
-        params.log2_db_size,
+        params.p,
+        params.m,
+        params.m,
     )
 }
 
+/// Generates the client's hint, which is the database multiplied by A. Also known as the setup.
 pub fn gen_hint(params: &SimplePIRParams, db: &Matrix) -> Matrix {
     let mut db_q = db.clone();
-    db_q.change_q(params.regev_params.q);
-    db_q.to_owned() * params.regev_params.a.to_owned()
+    db_q.change_q(params.q);
+    db_q.to_owned() * params.a.to_owned()
 }
 
+/// Generate a query to be sent to the server.
 pub fn query(
     params: &SimplePIRParams,
     idx: usize,
     s: &Vec<Element>,
 ) -> Vec<Element> {
-    let db_size = params.log2_db_size;
+    let db_size = params.m;
     assert!(idx < db_size);
-    let floor = params.regev_params.q / params.regev_params.p;
-    let e = gen_error_vec(&params.regev_params);
+    // q / p
+    let floor = params.q / params.p;
+
+    // The error term
+    let e = gen_error_vec(params.q, params.m);
     let err_matrix = Matrix::from_col(&e);
 
-    let mut query = params.regev_params.a.to_owned().mul_vec(s);
+    // query = A * s + e + q/p * u_i_col
+    let mut query = params.a.to_owned().mul_vec(s);
     query += err_matrix.rotated();
-    query[idx][0] += Element::from(params.regev_params.q, floor);
+
+    // Add q/p * 1 only to the index corresponding to the desired column
+    query[idx][0] += Element::from(params.q, floor);
 
     query.rotated()[0].to_owned()
 }
@@ -63,12 +73,26 @@ pub fn answer(query: &Vec<Element>, db: &Matrix) ->
     Matrix
 {
     let mut db_q = db.clone();
-    for i in 0..db_q.num_cols() {
-        for j in 0..db_q.num_rows() {
-            db_q[i][j].q = query[0].q;
-        }
-    }
+    db_q.change_q(query[0].q);
     db_q.to_owned().mul_vec(query)
+}
+
+pub fn recover_row(
+    params: &SimplePIRParams,
+    s: &Vec<Element>,
+    hint: &Matrix,
+    answer: &Matrix,
+) -> Vec<Element> {
+    let p = params.p;
+    let q = params.q as f64;
+
+    let interim = hint.to_owned().mul_vec(s);
+    let mut ans = answer.to_owned();
+    ans -= interim;
+
+    ans.data.iter().map(
+        |v| Element::from(p, ((v[0].uint * p) as f64 / q).round() as u64 % p)
+    ).collect()
 }
 
 pub fn recover(
@@ -78,21 +102,21 @@ pub fn recover(
     hint: &Matrix,
     answer: &Matrix,
 ) -> Element {
-    let p = params.regev_params.p;
-    let q = params.regev_params.q;
+    let p = params.p;
+    let q = params.q as f64;
 
     let interim = hint.to_owned().mul_vec(s);
     let mut ans = answer.to_owned();
-    ans -= interim.to_owned();
+    ans -= interim;
 
-    let x = ((ans[idx][0].uint * p) as f64 / q as f64).round() as u64 % p;
+    let x = ((ans[idx][0].uint * p) as f64 / q).round() as u64 % p;
     Element::from(p, x)
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::regev::gen_secret;
+    use super::*;
 
     fn test_simplepir_impl(desired_col: usize, desired_row: usize) {
         let params = gen_params();
@@ -100,13 +124,16 @@ mod tests {
 
         let db_item = &db[desired_col][desired_row];
 
-        let secret = gen_secret(&params.regev_params);
+        let secret = gen_secret(params.q, params.n);
         let hint = gen_hint(&params, &db);
 
         let query = query(&params, desired_row, &secret);
         let answer = answer(&query, &db);
-        let recovered = recover(&params, &secret, desired_col, &hint, &answer);
-        assert_eq!(recovered, *db_item);
+        let recovered_item = recover(&params, &secret, desired_col, &hint, &answer);
+        assert_eq!(recovered_item, *db_item);
+
+        let recovered_row = recover_row(&params, &secret, &hint, &answer);
+        assert_eq!(recovered_row, db.rotated()[desired_row]);
     }
 
     #[test]
@@ -123,7 +150,7 @@ mod tests {
         let db = gen_db(&params);
         let hint = gen_hint(&params, &db);
 
-        let secret = gen_secret(&params.regev_params);
+        let secret = gen_secret(params.q, params.n);
 
         let query = query(&params, desired_row, &secret);
         let ans = answer(&query, &db);
@@ -133,26 +160,27 @@ mod tests {
         assert_eq!(recovered, *db_item);
 
         // Flip all bits of one row
+        let row_to_flip = desired_col;
         let mut db = db.clone();
 
-        let mut updated_row = Vec::with_capacity(params.log2_db_size);
+        let mut updated_row = Vec::with_capacity(params.m);
         for i in 0..db.num_rows() {
             // Flip the bits in the row
-            db[desired_col][i] -= Element::from(params.regev_params.p, 1);
+            db[row_to_flip][i] -= Element::from(params.p, 1);
             updated_row.push(
-                Element::from(params.regev_params.q, db[desired_col][i].uint)
+                Element::from(params.q, db[row_to_flip][i].uint)
             );
         }
-        db.change_q(params.regev_params.q);
+        db.change_q(params.q);
 
         // Now update the hint
         let mut hint = hint.clone();
 
         // This operation is much more efficient than regenerating the whole hint matrix
-        let updated_hint_row = Matrix::from_col(&updated_row) * params.regev_params.a.to_owned();
+        let updated_hint_row = Matrix::from_col(&updated_row) * params.a.to_owned();
 
         for j in 0..hint.num_rows() {
-            hint[desired_col][j] = updated_hint_row[0][j].clone();
+            hint[row_to_flip][j] = updated_hint_row[0][j].clone();
         }
 
         let ans = answer(&query, &db);

@@ -72,6 +72,30 @@ impl Element {
         }
         Self::from(q, r % q)
     }
+
+    pub fn recompose(p: u64, q: u64, vals: &Vec<u64>) -> Self {
+        let mut result = 0u64;
+        let mut r = 1;
+        for digit in vals {
+            result += r * digit;
+            r *= p;
+        }
+        Element::from(q, result)
+    }
+
+    pub fn decomposed(self, p: u64) -> Vec<u64> {
+        let num_digits = ((self.q - 1) as f64).log(p as f64).ceil() as usize;
+        let mut digits = vec![0; num_digits];
+        let mut n = self.uint;
+
+        let mut i = 0;
+        while n > 0 {
+            digits[i] = n % p;
+            n /= p;
+            i += 1; 
+        }
+        digits
+    }
 }
 
 impl PartialOrd for Element {
@@ -250,6 +274,28 @@ pub mod tests {
         let g = Element::from(gen_q(), 2u64);
         f *= g;
         assert_eq!(f.uint, 99u64);
+    }
+
+    #[test]
+    fn test_recompose() {
+        let q = gen_q();
+        for i in 0..q {
+            for p in 2..3 {
+                let e = Element::from(q, i);
+                let d = e.to_owned().decomposed(p);
+                assert_eq!(Element::recompose(p, q, &d), e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_decomposed() {
+        let q = gen_q();
+        assert_eq!(Element::from(q, 1u64).decomposed(2), vec![1, 0, 0, 0, 0, 0, 0]);
+        assert_eq!(Element::from(q, 2u64).decomposed(2), vec![0, 1, 0, 0, 0, 0, 0]);
+        assert_eq!(Element::from(q, 3u64).decomposed(2), vec![1, 1, 0, 0, 0, 0, 0]);
+        assert_eq!(Element::from(q, 4u64).decomposed(2), vec![0, 0, 1, 0, 0, 0, 0]);
+        assert_eq!(Element::from(q, 100u64).decomposed(2), vec![0, 0, 1, 0, 0, 1, 1]);
     }
 
     /*

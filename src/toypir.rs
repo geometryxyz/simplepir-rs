@@ -35,7 +35,7 @@ pub fn query(
         } else {
             0
         };
-        let e = gen_error_vec(params);
+        let e = gen_error_vec(params.q, params.m);
         let enc = encrypt(
             params,
             s,
@@ -147,7 +147,7 @@ pub mod tests {
     #[test]
     fn test_pir() {
         let params = simple_params();
-        let s = gen_secret(&params);
+        let s = gen_secret(params.q, params.n);
         for _ in 0..50 {
             test_pir_impl(&params, &s);
         }

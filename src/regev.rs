@@ -96,7 +96,7 @@ pub fn decrypt(
     let raw = Matrix::from_single(ciphertext) - a_s;
 
     // Round to the nearest q / p
-    let x = ((raw[0][0].uint * &params.p) as f64 / params.q as f64).round() as u64 % params.p;
+    let x = ((raw[0][0].uint * params.p) as f64 / params.q as f64).round() as u64 % params.p;
 
     Element::from(params.p, x)
 }
@@ -122,22 +122,23 @@ pub fn gen_random_normal_matrix(
     matrix
 }
 
-pub fn gen_secret(params: &Params) -> Vec<Element> {
-    let mut secret = Vec::with_capacity(params.n);
-    for _ in 0..params.n {
-        secret.push(Element::gen_uniform_rand(params.q));
+pub fn gen_secret(q: u64, n: usize) -> Vec<Element> {
+    let mut secret = Vec::with_capacity(n);
+    for _ in 0..n {
+        secret.push(Element::gen_uniform_rand(q));
     }
     secret
 }
 
-pub fn gen_error_vec(params: &Params) -> Vec<Element> {
+
+pub fn gen_error_vec(q: u64, m: usize) -> Vec<Element> {
     let sample_space = 6;
     let half_sample_space = sample_space / 2;
-    let mut error_vec = Vec::with_capacity(params.m);
-    for _ in 0..params.m {
+    let mut error_vec = Vec::with_capacity(m);
+    for _ in 0..m {
         let rand = Element::gen_uniform_rand(sample_space);
-        let mut e = Element::from(params.q, rand.uint);
-        e -= Element::from(params.q, half_sample_space);
+        let mut e = Element::from(q, rand.uint);
+        e -= Element::from(q, half_sample_space);
         error_vec.push(e);
     }
     error_vec
@@ -158,8 +159,8 @@ pub mod tests {
 
     fn encrypt_and_decrypt_impl(pu: u64) {
         let params = simple_params();
-        let secret = gen_secret(&params);
-        let e = gen_error_vec(&params);
+        let secret = gen_secret(params.q, params.n);
+        let e = gen_error_vec(params.q, params.m);
 
         let plaintext = Element::from(params.p, pu);
         let ciphertext = encrypt(&params, &secret, &e, &plaintext);
@@ -175,9 +176,9 @@ pub mod tests {
     }
 
     fn homomorphic_addition_impl(params: &Params) {
-        let secret = gen_secret(&params);
-        let e_0 = gen_error_vec(&params);
-        let e_1 = gen_error_vec(&params);
+        let secret = gen_secret(params.q, params.n);
+        let e_0 = gen_error_vec(params.q, params.m);
+        let e_1 = gen_error_vec(params.q, params.m);
 
         let plaintext_0 = Element::from(params.p, 0);
         let ciphertext_0 = encrypt(&params, &secret, &e_0, &plaintext_0);
@@ -204,8 +205,8 @@ pub mod tests {
     fn test_homomorphic_multiplication_impl() {
         let mut params = simple_params();
         params.p = 3;
-        let secret = gen_secret(&params);
-        let e = gen_error_vec(&params);
+        let secret = gen_secret(params.q, params.n);
+        let e = gen_error_vec(params.q, params.m);
 
         // Encrypt and decrypt the value 1 mod 3
         let plaintext_1 = Element::from(params.p, 1);
