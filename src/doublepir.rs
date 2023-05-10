@@ -35,16 +35,16 @@ pub fn gen_params() -> DoublePIRParams {
     let q = 3329;
     let std_dev = 6.4;
     // rows, cols - TODO: change gen_uniform_rand
-    let a_1 = Matrix::gen_uniform_rand(q, n, m);
-    let a_2 = Matrix::gen_uniform_rand(q, n, l);
+    let a_1 = Matrix::gen_uniform_rand(q, m, n);
+    let a_2 = Matrix::gen_uniform_rand(q, l, n);
     DoublePIRParams { a_1, a_2, q, l, p, n, m, std_dev }
 }
 
 pub fn gen_db(params: &DoublePIRParams) -> Matrix {
     Matrix::gen_uniform_rand(
         params.p,
-        params.m,
         params.l,
+        params.m,
     )
 }
 
@@ -80,12 +80,15 @@ pub fn query(
     let e_2 = Matrix::from_col(&gen_error_vec(params.q, params.l));
 
     // Compute c_1 = A_1 * s_1 + e_1 + floor * u_i_row
+    // NOTE: perhaps due to a bug in our Matrix implementation, row and col are reversed. As such,
+    // while the paper notes that c_1 contains floor at u_i_col, we instead use row_i.
     let mut c_1 = params.a_1.to_owned().mul_vec(s_1) + e_1.rotated();
     c_1[row_i][0] += floor.clone();
 
     assert_eq!(c_1.num_cols(), params.m);
 
     // Compute c_2 = A_2 * s_2 + e_2 + floor * u_i_col
+    // NOTE: same bug as above
     let mut c_2 = params.a_2.to_owned().mul_vec(s_2) + e_2.rotated();
     c_2[col_i][0] += floor;
     assert_eq!(c_2.num_cols(), params.l);

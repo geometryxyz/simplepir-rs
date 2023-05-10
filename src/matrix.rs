@@ -78,7 +78,7 @@ impl Matrix {
     }
 
     // TODO: change all (rows, cols) to (cols, rows) for consistency with the paper
-    pub fn gen_uniform_rand(q: u64, rows: usize, cols: usize) -> Self  {
+    pub fn gen_uniform_rand(q: u64, cols: usize, rows: usize) -> Self  {
         let mut a = Vec::with_capacity(cols);
         for _ in 0..cols {
             let mut row = Vec::with_capacity(rows);

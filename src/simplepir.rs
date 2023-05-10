@@ -23,7 +23,7 @@ pub fn gen_params() -> SimplePIRParams {
     let q = 3329;
     let p = 2;
     let std_dev = 6.4;
-    let a = Matrix::gen_uniform_rand(q, n, m);
+    let a = Matrix::gen_uniform_rand(q, m, n);
 
     SimplePIRParams { a, q, p, n, m, std_dev }
 }

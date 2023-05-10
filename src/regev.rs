@@ -24,7 +24,7 @@ pub fn simple_params() -> Params {
     let p = 2;
     let std_dev = 6.4;
 
-    let a = Matrix::gen_uniform_rand(q, n, m);
+    let a = Matrix::gen_uniform_rand(q, m, n);
 
     Params { a, q, p, n, m, std_dev }
 }
