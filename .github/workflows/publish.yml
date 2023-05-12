@@ -5,7 +5,7 @@ on:
     branches: ["manim"]
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -16,9 +16,15 @@ jobs:
       - name: Install manim and manim-slides
         run: cd manim && pip install -r requirements.txt
 
-      #- name: Deploy to GitHub Pages
-        #uses: peaceiris/actions-gh-pages@v3
-        #with:
-          #github_token: ${{ secrets.GITHUB_TOKEN }}
-          #publish_dir: ./docs/book/html
+      - name: Compile scenes
+        run: cd manim && manim -qh simplepir.py SimplePIR
+
+      - name: Compile slides
+        run: cd manim && manim-slides convert SimplePIR --to=html ./slides/slides.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./manim/slides/
 
