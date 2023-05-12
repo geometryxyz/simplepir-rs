@@ -15,8 +15,24 @@ class SimplePIR(Slide):
 
 
     def slide_1(self):
+        self.slide_user_server(
+            "Problem Statement",
+            r"What's the balance of \texttt{0xabcd}?",
+            "It's 123 ETH",
+            r"The Server now knows that the User is interested in \texttt{0xabcd}!"
+        )
+
+    def slide_2(self):
+        self.slide_user_server(
+            "Ideal solution",
+            "What's the balance of XXX?",
+            "It's YYY",
+            r"The User learns that \texttt{0xabcd} has 123 ETH but the \\Server doesn't learn which address the user is interested in!"
+        )
+
+    def slide_user_server(self, title_text, request_text, response_text, note_text):
         # Title
-        title = Title("Problem Statement")
+        title = Title(title_text)
         self.add(title)
 
         # User
@@ -25,7 +41,7 @@ class SimplePIR(Slide):
 
         # Request
 
-        request = Tex(r"What's the balance of \texttt{0xabcd}?")
+        request = Tex(request_text)
         r_arrow = Arrow(start=LEFT, end=RIGHT)
         r_arrow.next_to(request, DOWN)
 
@@ -34,7 +50,7 @@ class SimplePIR(Slide):
         self.add(r_arrow)
 
         # Response
-        response = Tex("It's 123 ETH")
+        response = Tex(response_text)
         response.next_to(r_arrow, DOWN, buff=1)
 
         l_arrow = Arrow(start=RIGHT, end=LEFT)
@@ -43,7 +59,7 @@ class SimplePIR(Slide):
         l_arrow.target.shift(2 * LEFT)
 
         # Note
-        note = Tex(r"The Server now knows that the User is interested in \texttt{0xabcd}!")
+        note = Tex(note_text)
         note.next_to(l_arrow, DOWN)
 
         # Server
@@ -71,6 +87,11 @@ class SimplePIR(Slide):
         self.clear()
 
         self.slide_1()
-        self.wait(5)
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_2()
+        self.wait(0.1)
         self.next_slide()
         self.clear()
