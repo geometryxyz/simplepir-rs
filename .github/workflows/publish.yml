@@ -14,7 +14,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install manim dependencies
-        run: sudo apt -y update && sudo apt -y install build-essential python3-dev libcairo2-dev libpango1.0-dev ffmpeg texlive-latex-extra
+        run: sudo apt -y update && sudo apt -y install build-essential python3-dev libcairo2-dev libpango1.0-dev ffmpeg texlive-latex-extra libegl-dev
 
       - name: Install manim and manim-slides
         run: cd manim && pip install -r requirements.txt
