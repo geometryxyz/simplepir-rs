@@ -63,9 +63,12 @@ pub fn encrypt(
 
     // Compute As
     let a_s = params.a.to_owned().mul_vec(secret);
+    println!("a: {:?}", params.a.dimensions());
+    println!("a_s: {}", a_s);
 
     // Compute b = As + e
     let b = a_s + Matrix::from(&vec![e.clone()]).rotated();
+    println!("b: {}", b);
 
     let floor = params.q / params.p;
     let floor = Matrix::from_single(&Element::from(params.q, floor));
