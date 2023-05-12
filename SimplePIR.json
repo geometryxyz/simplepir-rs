@@ -1,0 +1,33 @@
+{
+  "slides": [
+    {
+      "type": "slide",
+      "start_animation": 0,
+      "end_animation": 1,
+      "number": 1,
+      "terminated": false
+    },
+    {
+      "type": "last",
+      "start_animation": 1,
+      "end_animation": 8,
+      "number": 2,
+      "terminated": false
+    }
+  ],
+  "files": [
+    "slides/files/SimplePIR/2902699114_51972775_2277365066.mp4",
+    "slides/files/SimplePIR/3931933789_2591644620_1477606989.mp4",
+    "slides/files/SimplePIR/3931933789_1185610756_2071841904.mp4",
+    "slides/files/SimplePIR/3931933789_645682970_4201899319.mp4",
+    "slides/files/SimplePIR/3931933789_3637074786_2215249227.mp4",
+    "slides/files/SimplePIR/3931933789_4151990961_195084051.mp4",
+    "slides/files/SimplePIR/3931933789_645682970_452602525.mp4",
+    "slides/files/SimplePIR/3931933789_36632488_2198195500.mp4"
+  ],
+  "resolution": [
+    1920,
+    1080
+  ],
+  "background_color": "black"
+}
