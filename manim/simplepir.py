@@ -2,6 +2,13 @@ from manim import *
 from manim_slides import Slide
 from layouts import title_and_content_slide, hero_slide
 
+def textbox(text):
+    result = VGroup()
+    box = Rectangle()
+    text = Text(text).move_to(box.get_center())
+    result.add(box, text)
+    return result
+
 
 class SimplePIR(Slide):
     def slide_0(self):
@@ -80,6 +87,35 @@ class SimplePIR(Slide):
         self.add(note)
 
 
+    def slide_3(self):
+        # Title
+        title = Title("Potential use cases")
+        self.add(title)
+
+        # Bulleted list
+        blist = BulletedList(
+            "Private block explorers",
+            "Private medical encyclopedias",
+            "Private contact lookups",
+            "Private precomputed witness data for ZK protocols"
+        )
+        self.add(blist)
+
+
+    def slide_4(self):
+        # Title
+        title = Title("Building blocks")
+        self.add(title)
+
+        blist = BulletedList(
+            "Matrices",
+            "Regev encryption",
+            "SimplePIR",
+            "DoublePIR"
+        )
+        self.add(blist)
+
+
     def construct(self):
         self.slide_0()
         self.wait(0.1)
@@ -92,6 +128,16 @@ class SimplePIR(Slide):
         self.clear()
 
         self.slide_2()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_3()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_4()
         self.wait(0.1)
         self.next_slide()
         self.clear()
