@@ -67,8 +67,8 @@ def play_row_col_mul(slide, mm_items, left_row_index, right_col_index):
     slide.remove(m2_sr)
 
 def gen_mat_mul_slide(slide, m0_data, m1_data):
-    m0_data = [[1, 2, 3], [4, 5, 6]]
-    m1_data = [[1, 0], [0, 1], [1, 0]]
+    # m0_data = [[1, 2, 3], [4, 5, 6]]
+    # m1_data = [[1, 0], [0, 1], [1, 0]]
     mm_items = gen_mat_mul_items(m0_data, m1_data)
     group = mm_items["group"]
     group.center()

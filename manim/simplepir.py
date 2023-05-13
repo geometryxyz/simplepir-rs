@@ -86,11 +86,11 @@ class SimplePIR(Slide):
         self.add(user, server)
         self.play(FadeIn(r_arrow), FadeIn(request))
         self.play(MoveToTarget(r_arrow))
-        self.wait(0.5)
+        self.wait(0.1)
         self.add(l_arrow)
         self.play(FadeIn(l_arrow), FadeIn(response))
         self.play(MoveToTarget(l_arrow))
-        self.wait(0.5)
+        self.wait(0.1)
         self.add(note)
 
 
@@ -299,7 +299,12 @@ class SimplePIR(Slide):
             """
         )
 
-        warning = Tex("$e_0 + e_1$ is noise growth and must be tracked")
+        warning = Tex(
+            r"""
+            $e_0 + e_1$ is noise growth and must be tracked\\
+            Note that $c_0 + c_1$ also adds matrix $A$
+            """
+        )
         warning.next_to(content, DOWN)
 
         group = Group(content)
@@ -320,7 +325,8 @@ class SimplePIR(Slide):
         content = Tex(
             r"""
             $c_0 = \mathsf{encrypt}(p_0, s, e_0)$\\
-            $c_0 \cdot p_1 = \mathsf{encrypt}(p_0 \cdot p_1, s, e_0 \cdot p_1)$
+            $c_0 \cdot p_1 = \mathsf{encrypt}(p_0 \cdot p_1, s, e_0 \cdot p_1)$\\
+            Note that $c_0 \cdot p_1$ also multiplies matrix $A$
             """
         )
         group = Group(content)
@@ -433,6 +439,114 @@ class SimplePIR(Slide):
         group.center()
         self.add(group, note)
 
+    def slide_17(self):
+        title = Title("SimplePIR")
+        self.add(title)
+
+        db = Matrix([[3, 4], [5, 6]])
+        db_label = Text("db")
+        db_label.next_to(db, UP)
+
+        times = Tex(r"$\times$")
+        times.next_to(db, RIGHT)
+
+        q = Matrix([["\mathsf{e}(1)\,", "\mathsf{e}(0)"]])
+        q.next_to(times, RIGHT)
+
+        q_label = Text("q")
+        q_label.next_to(q, UP)
+
+        group = Group(db, db_label, times, q, q_label)
+        group.center()
+        self.add(group)
+
+    def slide_18(self):
+        # Title
+        title = Title("SimplePIR")
+        self.add(title)
+
+        # User
+        user = Text("User")
+        user.to_edge(LEFT)
+
+        # Hint
+        hint = Tex(r"$\mathsf{hint}_c = \mathsf{db} \times A$")
+        hint_arrow = Arrow(start=RIGHT, end=LEFT)
+        hint_arrow.next_to(hint, DOWN)
+
+        hint_arrow.generate_target()
+        hint_arrow.target.shift(2 * LEFT)
+        self.add(hint_arrow)
+
+        # Note
+        note = Tex(r"$\mathsf{hint}_c$ is sent beforehand")
+        # note.next_to(hint_arrow, DOWN)
+        note.to_edge(DOWN)
+
+        # Server
+
+        server = Text("Server")
+        server.to_edge(RIGHT)
+
+        # Animation
+
+        self.add(user, server)
+        self.play(FadeIn(hint_arrow), FadeIn(hint))
+        self.play(MoveToTarget(hint_arrow))
+        self.add(note)
+
+    def slide_19(self):
+        # Title
+        title = Title("SimplePIR")
+        self.add(title)
+
+        # User
+        user = Text("User")
+        user.to_edge(LEFT)
+
+        # Query
+        query = Tex(r"$\mathsf{q} = [\mathsf{e}(1), \mathsf{e(0)}]$")
+        query.next_to(title, DOWN, buff=1)
+
+        query_arrow = Arrow(start=LEFT, end=RIGHT)
+        query_arrow.next_to(query, DOWN)
+        query_arrow.generate_target()
+        query_arrow.target.shift(2 * RIGHT)
+
+        # Answer
+        answer = Tex(r"$\mathsf{ans} = [\mathsf{e}(3), \mathsf{e(4)}]$")
+        answer.next_to(query_arrow, DOWN)
+
+        answer_arrow = Arrow(start=RIGHT, end=LEFT)
+        answer_arrow.next_to(answer, DOWN)
+        answer_arrow.generate_target()
+        answer_arrow.target.shift(2 * LEFT)
+
+        # Note
+        note = Tex(
+            """
+            The user can now decrypt the answer to get the value they want.\\
+            Since their query is encrypted, the server doesn't know which value it is!
+            """,
+            font_size=40
+        )
+        note.to_edge(DOWN)
+
+        # Server
+        server = Text("Server")
+        server.to_edge(RIGHT)
+
+        self.add(note)
+        # Animation
+        self.add(user, server)
+        self.add(query_arrow)
+        self.play(FadeIn(query_arrow), FadeIn(query))
+        self.play(MoveToTarget(query_arrow))
+        self.wait(0.1)
+        self.add(answer_arrow)
+        self.play(FadeIn(answer_arrow), FadeIn(answer))
+        self.play(MoveToTarget(answer_arrow))
+
     def construct(self):
         self.slide_0()
         self.wait(0.1)
@@ -515,6 +629,21 @@ class SimplePIR(Slide):
         self.clear()
 
         self.slide_16()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_17()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_18()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_19()
         self.wait(0.1)
         self.next_slide()
         self.clear()
