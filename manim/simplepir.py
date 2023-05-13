@@ -288,8 +288,150 @@ class SimplePIR(Slide):
         self.regev(True)
 
     def slide_11(self):
-        title = Title("SimplePIR")
+        title = Title("Homomorphic addition")
         self.add(title)
+
+        content = Tex(
+            r"""
+            $c_0 = \mathsf{encrypt}(p_0, s, e_0)$\\
+            $c_1 = \mathsf{encrypt}(p_1, s, e_1)$\\
+            $c_0 + c1 = \mathsf{encrypt}(p_0 + p1, s, e_0 + e1)$
+            """
+        )
+
+        warning = Tex("$e_0 + e_1$ is noise growth and must be tracked")
+        warning.next_to(content, DOWN)
+
+        group = Group(content)
+        group.center()
+        self.add(content)
+
+        r_1 = SurroundingRectangle(content[0][38:43])
+        r_2 = SurroundingRectangle(content[0][52:57])
+        self.play(FadeIn(r_1))
+        self.play(FadeIn(r_2))
+
+        self.add(warning)
+
+    def slide_12(self):
+        title = Title("Homomorphic multiplication")
+        self.add(title)
+
+        content = Tex(
+            r"""
+            $c_0 = \mathsf{encrypt}(p_0, s, e_0)$\\
+            $c_0 \cdot p_1 = \mathsf{encrypt}(p_0 \cdot p_1, s, e_0 \cdot p_1)$
+            """
+        )
+        group = Group(content)
+        group.center()
+        self.add(content)
+
+        r_1 = SurroundingRectangle(content[0][19:24])
+        r_2 = SurroundingRectangle(content[0][33:38])
+        self.play(FadeIn(r_1))
+        self.play(FadeIn(r_2))
+
+    def slide_13(self):
+        title = Title("SimplePIR - intuition")
+        self.add(title)
+
+        m = Matrix([[3, 4], [5, 6]])
+
+        times = Tex(r"$\times$")
+        times.next_to(m, RIGHT)
+
+        q = Matrix([[1, 0]])
+        q.next_to(times, RIGHT)
+
+        eq = Tex(r"$=$")
+        eq.next_to(q, RIGHT)
+
+        result = Matrix([[3, 4]])
+        result.next_to(eq, RIGHT)
+
+        note = Tex(r"We can multiply a matrix by $[1, 0]$ to get the first row")
+        note.to_edge(DOWN)
+
+        group = Group(m, times, q, eq, result)
+        group.center()
+        self.add(group, note)
+
+    def slide_14(self):
+        title = Title("SimplePIR - intuition")
+        self.add(title)
+
+        m = Matrix([[3, 4], [5, 6]])
+
+        times = Tex(r"$\times$")
+        times.next_to(m, RIGHT)
+
+        q = Matrix([[0, 1]])
+        q.next_to(times, RIGHT)
+
+        eq = Tex(r"$=$")
+        eq.next_to(q, RIGHT)
+
+        result = Matrix([[5, 6]])
+        result.next_to(eq, RIGHT)
+
+        note = Tex(r"We can multiply a matrix by $[0, 1]$ to get the second row")
+        note.to_edge(DOWN)
+
+        group = Group(m, times, q, eq, result)
+        group.center()
+        self.add(group, note)
+
+    def slide_15(self):
+        title = Title("SimplePIR - intuition")
+        self.add(title)
+
+        m = Matrix([[3, 4], [5, 6]])
+
+        times = Tex(r"$\times$")
+        times.next_to(m, RIGHT)
+
+        q = Matrix([["\mathsf{e}(1)\,", "\mathsf{e}(0)"]])
+        q.next_to(times, RIGHT)
+
+        eq = Tex(r"$=$")
+        eq.next_to(q, RIGHT)
+
+        # result = Tex("?")
+        result = Matrix([["\mathsf{???}\;", "\mathsf{???}"]])
+        result.next_to(eq, RIGHT)
+
+        note = Tex(r"What if we multiply by encrypted $1$s and $0$s?")
+        note.to_edge(DOWN)
+
+        group = Group(m, times, q, eq, result)
+        group.center()
+        self.add(group, note)
+
+    def slide_16(self):
+        title = Title("SimplePIR - intuition")
+        self.add(title)
+
+        m = Matrix([[3, 4], [5, 6]])
+
+        times = Tex(r"$\times$")
+        times.next_to(m, RIGHT)
+
+        q = Matrix([["\mathsf{e}(1)\,", "\mathsf{e}(0)"]])
+        q.next_to(times, RIGHT)
+
+        eq = Tex(r"$=$")
+        eq.next_to(q, RIGHT)
+
+        result = Matrix([["\mathsf{e}(3)\;", "\mathsf{e}(4)"]])
+        result.next_to(eq, RIGHT)
+
+        note = Tex(r"We'll get an encrypted row of the data.")
+        note.to_edge(DOWN)
+
+        group = Group(m, times, q, eq, result)
+        group.center()
+        self.add(group, note)
 
     def construct(self):
         self.slide_0()
@@ -348,6 +490,31 @@ class SimplePIR(Slide):
         self.clear()
 
         self.slide_11()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_12()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_13()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_14()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_15()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_16()
         self.wait(0.1)
         self.next_slide()
         self.clear()
