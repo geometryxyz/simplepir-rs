@@ -78,10 +78,45 @@
       "terminated": false
     },
     {
-      "type": "last",
+      "type": "slide",
       "start_animation": 31,
-      "end_animation": 32,
+      "end_animation": 34,
       "number": 12,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 34,
+      "end_animation": 37,
+      "number": 13,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 37,
+      "end_animation": 38,
+      "number": 14,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 38,
+      "end_animation": 39,
+      "number": 15,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 39,
+      "end_animation": 40,
+      "number": 16,
+      "terminated": false
+    },
+    {
+      "type": "last",
+      "start_animation": 40,
+      "end_animation": 41,
+      "number": 17,
       "terminated": false
     }
   ],
@@ -117,7 +152,16 @@
     "slides/files/SimplePIR/3931933789_2686367673_3869895438.mp4",
     "slides/files/SimplePIR/3931933789_2686367673_4250459847.mp4",
     "slides/files/SimplePIR/3931933789_2686367673_1933587588.mp4",
-    "slides/files/SimplePIR/3931933789_2686367673_3436088430.mp4"
+    "slides/files/SimplePIR/3931933789_2041815884_2363413287.mp4",
+    "slides/files/SimplePIR/3931933789_1639510021_4120998830.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_2543347698.mp4",
+    "slides/files/SimplePIR/3931933789_647690112_2186094869.mp4",
+    "slides/files/SimplePIR/3931933789_3997055978_1843113763.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_1768830177.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_2721832460.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_3940065282.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_1943495426.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_3831918521.mp4"
   ],
   "resolution": [
     1920,
