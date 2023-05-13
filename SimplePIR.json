@@ -29,10 +29,59 @@
       "terminated": false
     },
     {
-      "type": "last",
+      "type": "slide",
       "start_animation": 16,
       "end_animation": 17,
       "number": 5,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 17,
+      "end_animation": 26,
+      "number": 6,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 26,
+      "end_animation": 27,
+      "number": 7,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 27,
+      "end_animation": 28,
+      "number": 8,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 28,
+      "end_animation": 29,
+      "number": 9,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 29,
+      "end_animation": 30,
+      "number": 10,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 30,
+      "end_animation": 31,
+      "number": 11,
+      "terminated": false
+    },
+    {
+      "type": "last",
+      "start_animation": 31,
+      "end_animation": 32,
+      "number": 12,
       "terminated": false
     }
   ],
@@ -53,7 +102,22 @@
     "slides/files/SimplePIR/3931933789_645682970_3079529896.mp4",
     "slides/files/SimplePIR/3931933789_2686367673_3215529271.mp4",
     "slides/files/SimplePIR/3931933789_2686367673_2551258519.mp4",
-    "slides/files/SimplePIR/3931933789_2686367673_2299037294.mp4"
+    "slides/files/SimplePIR/3931933789_2686367673_2299037294.mp4",
+    "slides/files/SimplePIR/3931933789_3238402887_757965939.mp4",
+    "slides/files/SimplePIR/3931933789_1150690421_986154896.mp4",
+    "slides/files/SimplePIR/3931933789_2533369283_757965939.mp4",
+    "slides/files/SimplePIR/3931933789_962841645_986154896.mp4",
+    "slides/files/SimplePIR/3931933789_3275571867_757965939.mp4",
+    "slides/files/SimplePIR/3931933789_2070472779_986154896.mp4",
+    "slides/files/SimplePIR/3931933789_2503703583_757965939.mp4",
+    "slides/files/SimplePIR/3931933789_3812094217_986154896.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_2450640536.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_520725358.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_465150115.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_3869895438.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_4250459847.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_1933587588.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_3436088430.mp4"
   ],
   "resolution": [
     1920,
