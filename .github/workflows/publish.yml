@@ -23,7 +23,7 @@ jobs:
         run: cd manim && manim -qh simplepir.py SimplePIR
 
       - name: Compile slides
-        run: cd manim && manim-slides convert SimplePIR --to=html ./slides/slides.html
+        run: cd manim && manim-slides convert SimplePIR --to=html ./slides/index.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
