@@ -45,47 +45,36 @@ def gen_mat_mul_items(m0_data, m1_data):
 
     return items
 
-class MatrixMul(Scene):
-    # def construct(self):
-        # m0_data = [[1, 2, 3], [4, 5, 6]]
-        # m1_data = [[1, 0], [0, 1], [1, 0]]
-        # mm_items = gen_mat_mul_items(m0_data, m1_data)
-        # group = mm_items["group"]
-        # group.center()
-        # self.add(group)
 
-    def play_row_col_mul(self, mm_items, left_row_index, right_col_index):
-        i = left_row_index
-        j = right_col_index
-        m0 = mm_items["m0"]
-        m1 = mm_items["m1"]
-        m2 = mm_items["m2"]
+def play_row_col_mul(slide, mm_items, left_row_index, right_col_index):
+    i = left_row_index
+    j = right_col_index
+    m0 = mm_items["m0"]
+    m1 = mm_items["m1"]
+    m2 = mm_items["m2"]
 
-        m0_sr = SurroundingRectangle(m0.get_rows()[i])
-        m1_sr = SurroundingRectangle(m1.get_columns()[j])
-        m2_sr = SurroundingRectangle(m2.get_entries()[i * 2 + j])
+    m0_sr = SurroundingRectangle(m0.get_rows()[i])
+    m1_sr = SurroundingRectangle(m1.get_columns()[j])
+    m2_sr = SurroundingRectangle(m2.get_entries()[i * 2 + j])
 
-        self.play(FadeIn(m0_sr), FadeIn(m1_sr))
+    slide.play(FadeIn(m0_sr), FadeIn(m1_sr))
 
-        t0 = Transform(m0_sr, m2_sr)
-        t1 = Transform(m1_sr, m2_sr)
-        self.play(t0, t1)
-        self.remove(m0_sr)
-        self.remove(m1_sr)
-        self.remove(m2_sr)
-        self.wait(0.25)
+    t0 = Transform(m0_sr, m2_sr)
+    t1 = Transform(m1_sr, m2_sr)
+    slide.play(t0, t1)
+    slide.remove(m0_sr)
+    slide.remove(m1_sr)
+    slide.remove(m2_sr)
 
-    def construct(self):
-        m0_data = [[1, 2, 3], [4, 5, 6]]
-        m1_data = [[1, 0], [0, 1], [1, 0]]
-        mm_items = gen_mat_mul_items(m0_data, m1_data)
-        group = mm_items["group"]
-        group.center()
+def gen_mat_mul_slide(slide, m0_data, m1_data):
+    m0_data = [[1, 2, 3], [4, 5, 6]]
+    m1_data = [[1, 0], [0, 1], [1, 0]]
+    mm_items = gen_mat_mul_items(m0_data, m1_data)
+    group = mm_items["group"]
+    group.center()
 
-        self.add(group)
+    slide.add(group)
 
-        for i in range(0, len(mm_items["m0"]) - 1):
-            for j in range(0, len(mm_items["m1"]) - 1):
-                self.play_row_col_mul(mm_items, i, j)
-
-        self.wait(2)
+    for i in range(0, len(mm_items["m0"]) - 1):
+        for j in range(0, len(mm_items["m1"]) - 1):
+            play_row_col_mul(slide, mm_items, i, j)
