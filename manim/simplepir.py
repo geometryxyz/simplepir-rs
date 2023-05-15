@@ -22,12 +22,13 @@ def legend_tex():
 def example_data():
     db = [[1, 1], [1, 0]]
     a = [[1, 2], [3, 4]]
-    s = [[6], [2]]
-    e = [[2], [1]]
     hint = mat_mul(db, a)
-    q = [[1], [6]]
+
+    s = [[1], [0]]
+    e = [[2], [1]]
     delta_u = [[3], [0]]
-    ans = np.array(mat_mul(db, q)) % 7
+    qu = np.array(mat_mul(a, s))+ np.array(e) + np.array(delta_u)
+    ans = np.array(mat_mul(db, qu)) % 7
 
     return {
         "db": db,
@@ -35,7 +36,7 @@ def example_data():
         "e": e,
         "s": s,
         "hint": hint,
-        "q": q,
+        "qu": qu,
         "ans": ans,
         "delta_u": delta_u
     }
@@ -486,7 +487,7 @@ class SimplePIR(Slide):
         qu = Matrix([["\mathsf{e}(1)\,"], ["\mathsf{e}(0)"]])
         qu.next_to(times, RIGHT)
 
-        qu_label = Tex("$\mathsf{q}$")
+        qu_label = Tex("$\mathsf{qu}$")
         qu_label.next_to(qu, UP)
 
         note = Text("Let's apply this idea to perform PIR!")
@@ -542,7 +543,7 @@ class SimplePIR(Slide):
         user.to_edge(LEFT)
 
         # Query
-        query = Tex(r"$\mathsf{q} = [\mathsf{e}(1)], [\mathsf{e(0)}]$")
+        query = Tex(r"$\mathsf{qu} = [\mathsf{e}(1)], [\mathsf{e(0)}]$")
         query.next_to(title, DOWN, buff=1)
 
         query_arrow = Arrow(start=LEFT, end=RIGHT)
@@ -635,7 +636,7 @@ class SimplePIR(Slide):
         hint_label.next_to(hint, UP)
         self.add(hint_label)
 
-        note = Tex(r"Let $q=7, p=2$\\First, compute $\mathsf{hint} = \mathsf{db} \times A$")
+        note = Tex(r"e.g. we want the element at row 1, col 1\\Let $q=7, p=2$\\First, compute $\mathsf{hint} = \mathsf{db} \times A$")
         note.to_edge(DOWN)
         self.add(note)
 
@@ -658,7 +659,7 @@ class SimplePIR(Slide):
         times = Tex(r"$\times$")
         times.next_to(a, RIGHT)
         
-        s_data = [[6], [2]]
+        s_data = data["s"]
         s = Matrix(s_data)
         s.next_to(times, RIGHT)
 
@@ -679,18 +680,18 @@ class SimplePIR(Slide):
         eq = Tex(r"$=$")
         eq.next_to(delta_u, RIGHT)
 
-        result_data = np.array(mat_mul(a_data, s_data))+ np.array(e_data) + np.array(delta_u_data)
-        result_data %= 7
-        result = Matrix(result_data)
-        result.next_to(eq, RIGHT)
+        qu_data = data["qu"]
+        qu_data %= 7
+        qu = Matrix(qu_data)
+        qu.next_to(eq, RIGHT)
 
-        result_label = Tex(r"$\mathsf{q}$")
+        qu_label = Tex(r"$\mathsf{qu}$")
 
-        note = Tex(r"Next, compute the query\\e.g. we want the element at row 1, col 0\\Note that we mod $q = 7$", font_size=50)
+        note = Tex(r"Next, compute the query\\Note that we mod $q = 7$", font_size=50)
         note.to_edge(DOWN)
         self.add(note)
 
-        group = Group(a, times, s, plus_1, e, plus_2, delta_u, eq, result)
+        group = Group(a, times, s, plus_1, e, plus_2, delta_u, eq, qu)
         group.center()
         self.add(group)
 
@@ -701,8 +702,8 @@ class SimplePIR(Slide):
         e_label = Tex(r"$\mathsf{e}$")
         e_label.next_to(e, UP)
         delta_u_label.next_to(delta_u, UP)
-        result_label.next_to(result, UP)
-        self.add(a_label, s_label, e_label, delta_u_label, result_label)
+        qu_label.next_to(qu, UP)
+        self.add(a_label, s_label, e_label, delta_u_label, qu_label)
 
 
     def slide_22(self):
@@ -710,19 +711,21 @@ class SimplePIR(Slide):
         title = Title("SimplePIR by hand")
         self.add(title)
 
-        db_data = [[1, 1], [1, 0]]
+        data = example_data()
+
+        db_data = data["db"]
         db = Matrix(db_data)
         times = Tex(r"$\times$")
         times.next_to(db, RIGHT)
 
-        qu_data = [[1], [6]]
+        qu_data = data["qu"]
         qu = Matrix(qu_data)
         qu.next_to(times, RIGHT)
 
         eq = Tex(r"$=$")
         eq.next_to(qu, RIGHT)
         
-        ans_data = np.array(mat_mul(db_data, qu_data)) % 7
+        ans_data = data["ans"]
         ans = Matrix(ans_data)
         ans.next_to(eq, RIGHT)
 
@@ -739,7 +742,7 @@ class SimplePIR(Slide):
         ans_label = Tex("$\mathsf{ans}$")
         ans_label.next_to(ans, UP)
 
-        note = Tex(r"The server multiplies $\mathsf{db}$ and $\mathsf{q}$ and \\returns the homomorphically encrypted row", font_size=50)
+        note = Tex(r"The server multiplies $\mathsf{db}$ and $\mathsf{qu}$ and \\returns the homomorphically encrypted row", font_size=50)
         note.to_edge(DOWN)
         self.add(note)
 
@@ -751,13 +754,12 @@ class SimplePIR(Slide):
         title = Title("SimplePIR by hand")
         self.add(title)
 
-        # TODO: get all these figures from a single function
-        db_data = [[1, 1], [1, 0]]
-        a_data = [[1, 2], [3, 4]]
-        hint_data = [mat_mul(db_data, a_data)[0]]
-        # ans_data = [[0], [1]]
-        ans_data = [[0]]
-        s_data = [[6], [2]]
+        data = example_data()
+        db_data = data["db"]
+        a_data = data["a"]
+        s_data = data["s"]
+        hint_data = [data["hint"][1]]
+        ans_data = [data["ans"][1]]
 
         ans = Matrix(ans_data)
 
@@ -777,7 +779,7 @@ class SimplePIR(Slide):
         eq.next_to(s, RIGHT)
 
         # result_data = np.array(ans_data) - np.array(mat_mul(hint_data, s_data))
-        # result_data = [[6], [4]] # hardcoded to avoid having to impl neg mod
+        # result_data = [result_data[0]]
         result_data = [[6]] # hardcoded to avoid having to impl neg mod
         result = Matrix(result_data)
 
@@ -787,7 +789,7 @@ class SimplePIR(Slide):
         group.center()
         self.add(group)
 
-        note = Tex(r"$6$ rounded to the nearest multiple of 3 \\and divided by 3 = 2 mod 2 = 0.\\$\mathsf{db}[0][1]$ does equal $0$. QED.")
+        note = Tex(r"$6$ rounded to the nearest multiple of 3 \\and divided by 3 = 2 mod 2 = 0.\\$\mathsf{db}[1][1]$ does equal $0$. QED.")
         note.to_edge(DOWN)
         self.add(note)
 
