@@ -54,14 +54,13 @@ class SimplePIR(Slide):
         user.to_edge(LEFT)
 
         # Request
-
         request = Tex(request_text)
         r_arrow = Arrow(start=LEFT, end=RIGHT)
         r_arrow.next_to(request, DOWN)
 
         r_arrow.generate_target()
-        r_arrow.target.shift(2 * RIGHT)
-        self.add(r_arrow)
+        # r_arrow.target.shift(2 * RIGHT)
+        # self.add(r_arrow)
 
         # Response
         response = Tex(response_text)
@@ -69,27 +68,34 @@ class SimplePIR(Slide):
 
         l_arrow = Arrow(start=RIGHT, end=LEFT)
         l_arrow.next_to(response, DOWN)
-        l_arrow.generate_target()
-        l_arrow.target.shift(2 * LEFT)
+        # l_arrow.generate_target()
+        # r_arrow.target.shift(2 * RIGHT)
+        # l_arrow.target.shift(2 * LEFT)
 
         # Note
         note = Tex(note_text)
         note.next_to(l_arrow, DOWN)
 
         # Server
-
         server = Text("Server")
         server.to_edge(RIGHT)
 
-        # Animation
+        # Group to center elements
+        group = Group(request, r_arrow, response, l_arrow)
+        group.center()
+        # r_arrow.target.shift(2 * RIGHT)
+        # l_arrow.target.shift(2 * LEFT)
 
+        # Animation
         self.add(user, server)
         self.play(FadeIn(r_arrow), FadeIn(request))
-        self.play(MoveToTarget(r_arrow))
+        # self.play(MoveToTarget(r_arrow))
+        self.add(r_arrow)
         self.wait(0.1)
         self.add(l_arrow)
         self.play(FadeIn(l_arrow), FadeIn(response))
-        self.play(MoveToTarget(l_arrow))
+        # self.play(MoveToTarget(l_arrow))
+        self.add(l_arrow)
         self.wait(0.1)
         self.add(note)
 
@@ -356,7 +362,7 @@ class SimplePIR(Slide):
         result = Matrix([[3, 4]])
         result.next_to(eq, RIGHT)
 
-        note = Tex(r"We can multiply a matrix by $[1, 0]$ to get the first row")
+        note = Tex(r"We can multiply the by $[1, 0]$ to get the first row")
         note.to_edge(DOWN)
 
         group = Group(m, times, q, eq, result)
@@ -381,7 +387,7 @@ class SimplePIR(Slide):
         result = Matrix([[5, 6]])
         result.next_to(eq, RIGHT)
 
-        note = Tex(r"We can multiply a matrix by $[0, 1]$ to get the second row")
+        note = Tex(r"We can multiply the matrix by $[0, 1]$ to get the second row")
         note.to_edge(DOWN)
 
         group = Group(m, times, q, eq, result)
@@ -456,6 +462,10 @@ class SimplePIR(Slide):
         q_label = Text("q")
         q_label.next_to(q, UP)
 
+        note = Text("Let's apply this idea to perform PIR!")
+        note.to_edge(DOWN)
+        self.add(note)
+
         group = Group(db, db_label, times, q, q_label)
         group.center()
         self.add(group)
@@ -474,12 +484,11 @@ class SimplePIR(Slide):
         hint_arrow = Arrow(start=RIGHT, end=LEFT)
         hint_arrow.next_to(hint, DOWN)
 
-        hint_arrow.generate_target()
-        hint_arrow.target.shift(2 * LEFT)
-        self.add(hint_arrow)
+        # hint_arrow.generate_target()
+        # hint_arrow.target.shift(2 * LEFT)
 
         # Note
-        note = Tex(r"$\mathsf{hint}_c$ is sent beforehand")
+        note = Tex(r"$\mathsf{hint}_c$ is sent beforehand.")
         # note.next_to(hint_arrow, DOWN)
         note.to_edge(DOWN)
 
@@ -492,7 +501,8 @@ class SimplePIR(Slide):
 
         self.add(user, server)
         self.play(FadeIn(hint_arrow), FadeIn(hint))
-        self.play(MoveToTarget(hint_arrow))
+        # self.play(MoveToTarget(hint_arrow))
+        self.add(hint_arrow)
         self.add(note)
 
     def slide_19(self):
@@ -510,8 +520,8 @@ class SimplePIR(Slide):
 
         query_arrow = Arrow(start=LEFT, end=RIGHT)
         query_arrow.next_to(query, DOWN)
-        query_arrow.generate_target()
-        query_arrow.target.shift(2 * RIGHT)
+        # query_arrow.generate_target()
+        # query_arrow.target.shift(2 * RIGHT)
 
         # Answer
         answer = Tex(r"$\mathsf{ans} = [\mathsf{e}(3), \mathsf{e(4)}]$")
@@ -519,8 +529,8 @@ class SimplePIR(Slide):
 
         answer_arrow = Arrow(start=RIGHT, end=LEFT)
         answer_arrow.next_to(answer, DOWN)
-        answer_arrow.generate_target()
-        answer_arrow.target.shift(2 * LEFT)
+        # answer_arrow.generate_target()
+        # answer_arrow.target.shift(2 * LEFT)
 
         # Note
         note = Tex(
@@ -536,16 +546,18 @@ class SimplePIR(Slide):
         server = Text("Server")
         server.to_edge(RIGHT)
 
-        self.add(note)
         # Animation
         self.add(user, server)
         self.add(query_arrow)
         self.play(FadeIn(query_arrow), FadeIn(query))
-        self.play(MoveToTarget(query_arrow))
+        # self.play(MoveToTarget(query_arrow))
+        self.add(query_arrow)
         self.wait(0.1)
         self.add(answer_arrow)
         self.play(FadeIn(answer_arrow), FadeIn(answer))
-        self.play(MoveToTarget(answer_arrow))
+        # self.play(MoveToTarget(answer_arrow))
+        self.add(answer_arrow)
+        self.add(note)
 
     def construct(self):
         self.slide_0()
