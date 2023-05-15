@@ -10,153 +10,149 @@
     {
       "type": "slide",
       "start_animation": 1,
-      "end_animation": 8,
+      "end_animation": 6,
       "number": 2,
       "terminated": false
     },
     {
       "type": "slide",
-      "start_animation": 8,
-      "end_animation": 15,
+      "start_animation": 6,
+      "end_animation": 11,
       "number": 3,
       "terminated": false
     },
     {
       "type": "slide",
-      "start_animation": 15,
-      "end_animation": 16,
+      "start_animation": 11,
+      "end_animation": 12,
       "number": 4,
       "terminated": false
     },
     {
       "type": "slide",
-      "start_animation": 16,
-      "end_animation": 17,
+      "start_animation": 12,
+      "end_animation": 13,
       "number": 5,
       "terminated": false
     },
     {
       "type": "slide",
-      "start_animation": 17,
-      "end_animation": 26,
+      "start_animation": 13,
+      "end_animation": 22,
       "number": 6,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 22,
+      "end_animation": 23,
+      "number": 7,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 23,
+      "end_animation": 24,
+      "number": 8,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 24,
+      "end_animation": 25,
+      "number": 9,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 25,
+      "end_animation": 26,
+      "number": 10,
       "terminated": false
     },
     {
       "type": "slide",
       "start_animation": 26,
       "end_animation": 27,
-      "number": 7,
-      "terminated": false
-    },
-    {
-      "type": "slide",
-      "start_animation": 27,
-      "end_animation": 28,
-      "number": 8,
-      "terminated": false
-    },
-    {
-      "type": "slide",
-      "start_animation": 28,
-      "end_animation": 29,
-      "number": 9,
-      "terminated": false
-    },
-    {
-      "type": "slide",
-      "start_animation": 29,
-      "end_animation": 30,
-      "number": 10,
-      "terminated": false
-    },
-    {
-      "type": "slide",
-      "start_animation": 30,
-      "end_animation": 31,
       "number": 11,
       "terminated": false
     },
     {
       "type": "slide",
-      "start_animation": 31,
-      "end_animation": 34,
+      "start_animation": 27,
+      "end_animation": 30,
       "number": 12,
       "terminated": false
     },
     {
       "type": "slide",
-      "start_animation": 34,
-      "end_animation": 37,
+      "start_animation": 30,
+      "end_animation": 33,
       "number": 13,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 33,
+      "end_animation": 34,
+      "number": 14,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 34,
+      "end_animation": 35,
+      "number": 15,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 35,
+      "end_animation": 36,
+      "number": 16,
+      "terminated": false
+    },
+    {
+      "type": "slide",
+      "start_animation": 36,
+      "end_animation": 37,
+      "number": 17,
       "terminated": false
     },
     {
       "type": "slide",
       "start_animation": 37,
       "end_animation": 38,
-      "number": 14,
-      "terminated": false
-    },
-    {
-      "type": "slide",
-      "start_animation": 38,
-      "end_animation": 39,
-      "number": 15,
-      "terminated": false
-    },
-    {
-      "type": "slide",
-      "start_animation": 39,
-      "end_animation": 40,
-      "number": 16,
-      "terminated": false
-    },
-    {
-      "type": "slide",
-      "start_animation": 40,
-      "end_animation": 41,
-      "number": 17,
-      "terminated": false
-    },
-    {
-      "type": "slide",
-      "start_animation": 41,
-      "end_animation": 42,
       "number": 18,
       "terminated": false
     },
     {
       "type": "slide",
-      "start_animation": 42,
-      "end_animation": 45,
+      "start_animation": 38,
+      "end_animation": 40,
       "number": 19,
       "terminated": false
     },
     {
       "type": "last",
-      "start_animation": 45,
-      "end_animation": 51,
+      "start_animation": 40,
+      "end_animation": 44,
       "number": 20,
       "terminated": false
     }
   ],
   "files": [
     "slides/files/SimplePIR/2902699114_51972775_2277365066.mp4",
-    "slides/files/SimplePIR/3931933789_2591644620_1477606989.mp4",
-    "slides/files/SimplePIR/3931933789_1185610756_2071841904.mp4",
-    "slides/files/SimplePIR/3931933789_2686367673_4201899319.mp4",
-    "slides/files/SimplePIR/3931933789_3637074786_2215249227.mp4",
-    "slides/files/SimplePIR/3931933789_4151990961_195084051.mp4",
-    "slides/files/SimplePIR/3931933789_2686367673_452602525.mp4",
-    "slides/files/SimplePIR/3931933789_2686367673_2198195500.mp4",
-    "slides/files/SimplePIR/3931933789_1544377342_3716823086.mp4",
-    "slides/files/SimplePIR/3931933789_1185610756_2094239339.mp4",
-    "slides/files/SimplePIR/3931933789_2686367673_905463448.mp4",
-    "slides/files/SimplePIR/3931933789_1538327204_668330546.mp4",
-    "slides/files/SimplePIR/3931933789_798119056_3496555367.mp4",
-    "slides/files/SimplePIR/3931933789_2686367673_3079529896.mp4",
-    "slides/files/SimplePIR/3931933789_2686367673_3215529271.mp4",
+    "slides/files/SimplePIR/3931933789_3660514227_3835025002.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_2683806712.mp4",
+    "slides/files/SimplePIR/3931933789_2418042156_3932928493.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_1084005371.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_485086728.mp4",
+    "slides/files/SimplePIR/3931933789_2611828773_1047869586.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_1912678178.mp4",
+    "slides/files/SimplePIR/3931933789_3888630699_1466071628.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_1131201107.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_1407448069.mp4",
     "slides/files/SimplePIR/3931933789_2686367673_2551258519.mp4",
     "slides/files/SimplePIR/3931933789_2686367673_2299037294.mp4",
     "slides/files/SimplePIR/3931933789_3238402887_757965939.mp4",
@@ -179,20 +175,17 @@
     "slides/files/SimplePIR/3931933789_1342666066_3514673782.mp4",
     "slides/files/SimplePIR/3931933789_1059319405_1535783105.mp4",
     "slides/files/SimplePIR/3931933789_2686367673_2839217145.mp4",
-    "slides/files/SimplePIR/3931933789_2686367673_2721832460.mp4",
-    "slides/files/SimplePIR/3931933789_2686367673_3940065282.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_2629001719.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_1980402996.mp4",
     "slides/files/SimplePIR/3931933789_2686367673_1943495426.mp4",
     "slides/files/SimplePIR/3931933789_2686367673_3831918521.mp4",
-    "slides/files/SimplePIR/3931933789_2686367673_1191389479.mp4",
-    "slides/files/SimplePIR/3931933789_887232436_871683409.mp4",
-    "slides/files/SimplePIR/3931933789_953081397_2468346661.mp4",
-    "slides/files/SimplePIR/3931933789_2686367673_393132948.mp4",
-    "slides/files/SimplePIR/3931933789_2417926411_4045383312.mp4",
-    "slides/files/SimplePIR/3931933789_3292923750_21928743.mp4",
-    "slides/files/SimplePIR/3931933789_2686367673_3379828263.mp4",
-    "slides/files/SimplePIR/3931933789_3143574495_3229118622.mp4",
-    "slides/files/SimplePIR/3931933789_943126786_3908596772.mp4",
-    "slides/files/SimplePIR/3931933789_2686367673_2492228787.mp4"
+    "slides/files/SimplePIR/3931933789_2686367673_2705275106.mp4",
+    "slides/files/SimplePIR/3931933789_913435545_2103784758.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_4210158970.mp4",
+    "slides/files/SimplePIR/3931933789_216916689_1977254728.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_2355041178.mp4",
+    "slides/files/SimplePIR/3931933789_2389170657_143679657.mp4",
+    "slides/files/SimplePIR/3931933789_2686367673_769695296.mp4"
   ],
   "resolution": [
     1920,
