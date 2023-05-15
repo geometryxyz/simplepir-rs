@@ -2,6 +2,7 @@ from manim import *
 from manim_slides import Slide
 from layouts import title_and_content_slide, hero_slide
 from matmul import gen_mat_mul_slide, gen_matrix, mat_mul
+import numpy as np
 
 def textbox(text):
     result = VGroup()
@@ -14,8 +15,14 @@ def textbox(text):
 def e_note():
     return Tex(r"Note: $e < \frac{1}{2} \cdot \lfloor q / p \rfloor$, so it gets rounded away")
 
-def legend_tex() :
+def legend_tex():
     return Tex(r"$\mu$ is the plaintext mod $p$\\$A$ is a public matrix mod $q$\\$s$ is a secret vector mod q\\$c$ is the ciphertext mod q\\$\lfloor q / p \rfloor$ is $q / p$ rounded down")
+
+# def example_data():
+    # db = [[1, 1], [1, 0]]
+    # a = [[1, 2], [3, 4]]
+    # hint = 
+
 
 class SimplePIR(Slide):
     def slide_0(self):
@@ -353,13 +360,13 @@ class SimplePIR(Slide):
         times = Tex(r"$\times$")
         times.next_to(m, RIGHT)
 
-        q = Matrix([[1, 0]])
+        q = Matrix([[1], [0]])
         q.next_to(times, RIGHT)
 
         eq = Tex(r"$=$")
         eq.next_to(q, RIGHT)
 
-        result = Matrix([[3, 4]])
+        result = Matrix([[3], [4]])
         result.next_to(eq, RIGHT)
 
         note = Tex(r"We can multiply the by $[1, 0]$ to get the first row")
@@ -378,13 +385,13 @@ class SimplePIR(Slide):
         times = Tex(r"$\times$")
         times.next_to(m, RIGHT)
 
-        q = Matrix([[0, 1]])
+        q = Matrix([[0], [1]])
         q.next_to(times, RIGHT)
 
         eq = Tex(r"$=$")
         eq.next_to(q, RIGHT)
 
-        result = Matrix([[5, 6]])
+        result = Matrix([[5], [6]])
         result.next_to(eq, RIGHT)
 
         note = Tex(r"We can multiply the matrix by $[0, 1]$ to get the second row")
@@ -403,14 +410,14 @@ class SimplePIR(Slide):
         times = Tex(r"$\times$")
         times.next_to(m, RIGHT)
 
-        q = Matrix([["\mathsf{e}(1)\,", "\mathsf{e}(0)"]])
+        q = Matrix([["\mathsf{e}(1)\,"], ["\mathsf{e}(0)"]])
         q.next_to(times, RIGHT)
 
         eq = Tex(r"$=$")
         eq.next_to(q, RIGHT)
 
         # result = Tex("?")
-        result = Matrix([["\mathsf{???}\;", "\mathsf{???}"]])
+        result = Matrix([["\mathsf{???}\;"], ["\mathsf{???}"]])
         result.next_to(eq, RIGHT)
 
         note = Tex(r"What if we multiply by encrypted $1$s and $0$s?")
@@ -429,13 +436,13 @@ class SimplePIR(Slide):
         times = Tex(r"$\times$")
         times.next_to(m, RIGHT)
 
-        q = Matrix([["\mathsf{e}(1)\,", "\mathsf{e}(0)"]])
+        q = Matrix([["\mathsf{e}(1)\,"], ["\mathsf{e}(0)"]])
         q.next_to(times, RIGHT)
 
         eq = Tex(r"$=$")
         eq.next_to(q, RIGHT)
 
-        result = Matrix([["\mathsf{e}(3)\;", "\mathsf{e}(4)"]])
+        result = Matrix([["\mathsf{e}(3)\;"], ["\mathsf{e}(4)"]])
         result.next_to(eq, RIGHT)
 
         note = Tex(r"We'll get an encrypted row of the data.")
@@ -450,16 +457,16 @@ class SimplePIR(Slide):
         self.add(title)
 
         db = Matrix([[3, 4], [5, 6]])
-        db_label = Text("db")
+        db_label = Tex("$\mathsf{db}$")
         db_label.next_to(db, UP)
 
         times = Tex(r"$\times$")
         times.next_to(db, RIGHT)
 
-        q = Matrix([["\mathsf{e}(1)\,", "\mathsf{e}(0)"]])
+        q = Matrix([["\mathsf{e}(1)\,"], ["\mathsf{e}(0)"]])
         q.next_to(times, RIGHT)
 
-        q_label = Text("q")
+        q_label = Tex("$\mathsf{q}$")
         q_label.next_to(q, UP)
 
         note = Text("Let's apply this idea to perform PIR!")
@@ -515,7 +522,7 @@ class SimplePIR(Slide):
         user.to_edge(LEFT)
 
         # Query
-        query = Tex(r"$\mathsf{q} = [\mathsf{e}(1), \mathsf{e(0)}]$")
+        query = Tex(r"$\mathsf{q} = [\mathsf{e}(1)], [\mathsf{e(0)}]$")
         query.next_to(title, DOWN, buff=1)
 
         query_arrow = Arrow(start=LEFT, end=RIGHT)
@@ -558,6 +565,220 @@ class SimplePIR(Slide):
         # self.play(MoveToTarget(answer_arrow))
         self.add(answer_arrow)
         self.add(note)
+
+    def slide_20(self):
+        # Title
+        title = Title("SimplePIR by hand")
+        self.add(title)
+
+        """
+        q = 7
+        p = 2
+        m = 2
+        n = 2
+        floor(q/p) = 3
+
+        A = n x m = 2 x 2
+        db = m x m = 2 x 2
+        """
+
+        db_data = [[1, 1], [1, 0]]
+        a_data = [[1, 2], [3, 4]]
+        hint_data = mat_mul(db_data, a_data)
+
+        db = Matrix(db_data)
+        times = Tex(r"$\times$")
+        times.next_to(db, RIGHT)
+
+        a = Matrix(a_data)
+        a.next_to(times, RIGHT)
+
+        eq = Tex(r"$=$")
+        eq.next_to(a, RIGHT)
+
+        hint = Matrix(hint_data)
+        hint.next_to(eq, RIGHT)
+
+        group = Group(a, db, hint, times, eq)
+        group.center()
+
+        db_label = Tex(r"$\mathsf{db}$")
+        db_label.next_to(db, UP)
+        self.add(db_label)
+
+        a_label = Tex(r"$A$")
+        a_label.next_to(a, UP)
+        self.add(a_label)
+
+        hint_label = Tex(r"$\mathsf{hint}$")
+        hint_label.next_to(hint, UP)
+        self.add(hint_label)
+
+        note = Tex(r"Let $q=7, p=2$\\First, compute $\mathsf{hint} = \mathsf{db} \times A$")
+        note.to_edge(DOWN)
+        self.add(note)
+
+        self.add(group)
+
+
+    def slide_21(self):
+        # Title
+        title = Title("SimplePIR by hand")
+        self.add(title)
+
+        a_data = [[1, 2], [3, 4]]
+        a = Matrix(a_data)
+
+        times = Tex(r"$\times$")
+        times.next_to(a, RIGHT)
+        
+        s_data = [[6], [2]]
+        s = Matrix(s_data)
+        s.next_to(times, RIGHT)
+
+        plus_1 = Tex(r"$+$")
+        plus_1.next_to(s)
+
+        e_data = [[2], [1]]
+        e = Matrix(e_data)
+        e.next_to(plus_1, RIGHT)
+
+        plus_2 = Tex(r"$+$")
+        plus_2.next_to(e)
+
+        delta_u_data = [[3], [0]]
+        delta_u = Matrix(delta_u_data)
+        delta_u.next_to(plus_2, RIGHT)
+
+        delta_u_label = Tex(r"$\lfloor 7 / 2 \rfloor \cdot [1, 0]$", font_size=35)
+
+        eq = Tex(r"$=$")
+        eq.next_to(delta_u, RIGHT)
+
+        result_data = np.array(mat_mul(a_data, s_data))+ np.array(e_data) + np.array(delta_u_data)
+        result_data %= 7
+        result = Matrix(result_data)
+        result.next_to(eq, RIGHT)
+
+        result_label = Tex(r"$\mathsf{q}$")
+
+        note = Tex(r"Next, compute the query (e.g. we want \\the element at row 1, col 0)\\Note that we mod $q = 7$", font_size=50)
+        note.to_edge(DOWN)
+        self.add(note)
+
+        group = Group(a, times, s, plus_1, e, plus_2, delta_u, eq, result)
+        group.center()
+        self.add(group)
+
+        a_label = Tex(r"$\mathsf{A}$")
+        a_label.next_to(a, UP)
+        s_label = Tex(r"$\mathsf{s}$")
+        s_label.next_to(s, UP)
+        e_label = Tex(r"$\mathsf{e}$")
+        e_label.next_to(e, UP)
+        delta_u_label.next_to(delta_u, UP)
+        # delta_u_label.align_to(delta_u, LEFT)
+        result_label.next_to(result, UP)
+        self.add(a_label, s_label, e_label, delta_u_label, result_label)
+
+
+    def slide_22(self):
+        # Title
+        title = Title("SimplePIR by hand")
+        self.add(title)
+
+        db_data = [[1, 1], [1, 0]]
+        db = Matrix(db_data)
+        times = Tex(r"$\times$")
+        times.next_to(db, RIGHT)
+
+        q_data = [[1], [6]]
+        q = Matrix(q_data)
+        q.next_to(times, RIGHT)
+
+        eq = Tex(r"$=$")
+        eq.next_to(q, RIGHT)
+        
+        ans_data = np.array(mat_mul(db_data, q_data)) % 7
+        ans = Matrix(ans_data)
+        ans.next_to(eq, RIGHT)
+
+        group = Group(db, times, q, eq, ans)
+        group.center()
+        self.add(group)
+
+        db_label = Tex("$\mathsf{db}$")
+        db_label.next_to(db, UP)
+
+        q_label = Tex("$\mathsf{q}$")
+        q_label.next_to(q, UP)
+
+        ans_label = Tex("$\mathsf{ans}$")
+        ans_label.next_to(ans, UP)
+
+        note = Tex(r"The server multiplies $\mathsf{db}$ and $\mathsf{q}$ and \\returns the homomorphically encrypted row", font_size=50)
+        note.to_edge(DOWN)
+        self.add(note)
+
+        self.add(db_label, q_label, ans_label)
+
+
+    def slide_23(self):
+        # Title
+        title = Title("SimplePIR by hand")
+        self.add(title)
+
+        # TODO: get all these figures from a single function
+        db_data = [[1, 1], [1, 0]]
+        a_data = [[1, 2], [3, 4]]
+        hint_data = [mat_mul(db_data, a_data)[0]]
+        # ans_data = [[0], [1]]
+        ans_data = [[0]]
+        s_data = [[6], [2]]
+
+        ans = Matrix(ans_data)
+
+        minus = Tex(r"$-$")
+        minus.next_to(ans)
+
+        hint = Matrix(hint_data)
+        hint.next_to(minus)
+
+        times = Tex(r"$\times$")
+        times.next_to(hint)
+
+        s = Matrix(s_data)
+        s.next_to(times, RIGHT)
+
+        eq = Tex(r"$=$")
+        eq.next_to(s, RIGHT)
+
+        # result_data = np.array(ans_data) - np.array(mat_mul(hint_data, s_data))
+        # result_data = [[6], [4]] # hardcoded to avoid having to impl neg mod
+        result_data = [[6]] # hardcoded to avoid having to impl neg mod
+        result = Matrix(result_data)
+
+        result.next_to(eq)
+
+        group = Group(ans, minus, hint, times, s, eq, result)
+        group.center()
+        self.add(group)
+
+        note = Tex(r"$6$ rounded to the nearest multiple of 3 \\and divided by 3 = 2 mod 2 = 0.\\$\mathsf{db}[0][1]$ does equal $0$. QED.")
+        note.to_edge(DOWN)
+        self.add(note)
+
+        ans_label = Tex("$\mathsf{ans}[1:]$")
+        ans_label.next_to(ans, UP)
+        hint_label = Tex("$\mathsf{hint}[1:]$")
+        hint_label.next_to(hint, UP)
+        s_label = Tex("$\mathsf{s}$")
+        s_label.next_to(s, UP)
+        result_label = Tex("$\hat{d}$")
+        result_label.next_to(result, UP)
+
+        self.add(ans_label, hint_label, s_label, result_label)
+
 
     def construct(self):
         self.slide_0()
@@ -656,6 +877,26 @@ class SimplePIR(Slide):
         self.clear()
 
         self.slide_19()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_20()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_21()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_22()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_23()
         self.wait(0.1)
         self.next_slide()
         self.clear()
