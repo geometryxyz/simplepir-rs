@@ -18,10 +18,27 @@ def e_note():
 def legend_tex():
     return Tex(r"$\mu$ is the plaintext mod $p$\\$A$ is a public matrix mod $q$\\$s$ is a secret vector mod q\\$c$ is the ciphertext mod q\\$\lfloor q / p \rfloor$ is $q / p$ rounded down")
 
-# def example_data():
-    # db = [[1, 1], [1, 0]]
-    # a = [[1, 2], [3, 4]]
-    # hint = 
+
+def example_data():
+    db = [[1, 1], [1, 0]]
+    a = [[1, 2], [3, 4]]
+    s = [[6], [2]]
+    e = [[2], [1]]
+    hint = mat_mul(db, a)
+    q = [[1], [6]]
+    delta_u = [[3], [0]]
+    ans = np.array(mat_mul(db, q)) % 7
+
+    return {
+        "db": db,
+        "a": a,
+        "e": e,
+        "s": s,
+        "hint": hint,
+        "q": q,
+        "ans": ans,
+        "delta_u": delta_u
+    }
 
 
 class SimplePIR(Slide):
@@ -252,6 +269,9 @@ class SimplePIR(Slide):
         self.add(title)
         self.add(note)
 
+        e_rect = SurroundingRectangle(Group(e, e_label)).scale(1.25)
+        self.add(e_rect)
+
     def slide_8(self):
         # Title
         title = Title("Regev encryption and decryption")
@@ -360,11 +380,11 @@ class SimplePIR(Slide):
         times = Tex(r"$\times$")
         times.next_to(m, RIGHT)
 
-        q = Matrix([[1], [0]])
-        q.next_to(times, RIGHT)
+        qu = Matrix([[1], [0]])
+        qu.next_to(times, RIGHT)
 
         eq = Tex(r"$=$")
-        eq.next_to(q, RIGHT)
+        eq.next_to(qu, RIGHT)
 
         result = Matrix([[3], [4]])
         result.next_to(eq, RIGHT)
@@ -372,7 +392,7 @@ class SimplePIR(Slide):
         note = Tex(r"We can multiply the by $[1, 0]$ to get the first row")
         note.to_edge(DOWN)
 
-        group = Group(m, times, q, eq, result)
+        group = Group(m, times, qu, eq, result)
         group.center()
         self.add(group, note)
 
@@ -385,11 +405,11 @@ class SimplePIR(Slide):
         times = Tex(r"$\times$")
         times.next_to(m, RIGHT)
 
-        q = Matrix([[0], [1]])
-        q.next_to(times, RIGHT)
+        qu = Matrix([[0], [1]])
+        qu.next_to(times, RIGHT)
 
         eq = Tex(r"$=$")
-        eq.next_to(q, RIGHT)
+        eq.next_to(qu, RIGHT)
 
         result = Matrix([[5], [6]])
         result.next_to(eq, RIGHT)
@@ -397,7 +417,7 @@ class SimplePIR(Slide):
         note = Tex(r"We can multiply the matrix by $[0, 1]$ to get the second row")
         note.to_edge(DOWN)
 
-        group = Group(m, times, q, eq, result)
+        group = Group(m, times, qu, eq, result)
         group.center()
         self.add(group, note)
 
@@ -410,11 +430,11 @@ class SimplePIR(Slide):
         times = Tex(r"$\times$")
         times.next_to(m, RIGHT)
 
-        q = Matrix([["\mathsf{e}(1)\,"], ["\mathsf{e}(0)"]])
-        q.next_to(times, RIGHT)
+        qu = Matrix([["\mathsf{e}(1)\,"], ["\mathsf{e}(0)"]])
+        qu.next_to(times, RIGHT)
 
         eq = Tex(r"$=$")
-        eq.next_to(q, RIGHT)
+        eq.next_to(qu, RIGHT)
 
         # result = Tex("?")
         result = Matrix([["\mathsf{???}\;"], ["\mathsf{???}"]])
@@ -423,7 +443,7 @@ class SimplePIR(Slide):
         note = Tex(r"What if we multiply by encrypted $1$s and $0$s?")
         note.to_edge(DOWN)
 
-        group = Group(m, times, q, eq, result)
+        group = Group(m, times, qu, eq, result)
         group.center()
         self.add(group, note)
 
@@ -436,11 +456,11 @@ class SimplePIR(Slide):
         times = Tex(r"$\times$")
         times.next_to(m, RIGHT)
 
-        q = Matrix([["\mathsf{e}(1)\,"], ["\mathsf{e}(0)"]])
-        q.next_to(times, RIGHT)
+        qu = Matrix([["\mathsf{e}(1)\,"], ["\mathsf{e}(0)"]])
+        qu.next_to(times, RIGHT)
 
         eq = Tex(r"$=$")
-        eq.next_to(q, RIGHT)
+        eq.next_to(qu, RIGHT)
 
         result = Matrix([["\mathsf{e}(3)\;"], ["\mathsf{e}(4)"]])
         result.next_to(eq, RIGHT)
@@ -448,7 +468,7 @@ class SimplePIR(Slide):
         note = Tex(r"We'll get an encrypted row of the data.")
         note.to_edge(DOWN)
 
-        group = Group(m, times, q, eq, result)
+        group = Group(m, times, qu, eq, result)
         group.center()
         self.add(group, note)
 
@@ -463,17 +483,17 @@ class SimplePIR(Slide):
         times = Tex(r"$\times$")
         times.next_to(db, RIGHT)
 
-        q = Matrix([["\mathsf{e}(1)\,"], ["\mathsf{e}(0)"]])
-        q.next_to(times, RIGHT)
+        qu = Matrix([["\mathsf{e}(1)\,"], ["\mathsf{e}(0)"]])
+        qu.next_to(times, RIGHT)
 
-        q_label = Tex("$\mathsf{q}$")
-        q_label.next_to(q, UP)
+        qu_label = Tex("$\mathsf{q}$")
+        qu_label.next_to(qu, UP)
 
         note = Text("Let's apply this idea to perform PIR!")
         note.to_edge(DOWN)
         self.add(note)
 
-        group = Group(db, db_label, times, q, q_label)
+        group = Group(db, db_label, times, qu, qu_label)
         group.center()
         self.add(group)
 
@@ -582,9 +602,10 @@ class SimplePIR(Slide):
         db = m x m = 2 x 2
         """
 
-        db_data = [[1, 1], [1, 0]]
-        a_data = [[1, 2], [3, 4]]
-        hint_data = mat_mul(db_data, a_data)
+        data = example_data()
+        db_data = data["db"]
+        a_data = data["a"]
+        hint_data = data["hint"]
 
         db = Matrix(db_data)
         times = Tex(r"$\times$")
@@ -626,7 +647,12 @@ class SimplePIR(Slide):
         title = Title("SimplePIR by hand")
         self.add(title)
 
-        a_data = [[1, 2], [3, 4]]
+        data = example_data()
+        a_data = data["a"]
+        s_data = data["s"]
+        e_data = data["e"]
+        delta_u_data = data["delta_u"]
+
         a = Matrix(a_data)
 
         times = Tex(r"$\times$")
@@ -639,14 +665,12 @@ class SimplePIR(Slide):
         plus_1 = Tex(r"$+$")
         plus_1.next_to(s)
 
-        e_data = [[2], [1]]
         e = Matrix(e_data)
         e.next_to(plus_1, RIGHT)
 
         plus_2 = Tex(r"$+$")
         plus_2.next_to(e)
 
-        delta_u_data = [[3], [0]]
         delta_u = Matrix(delta_u_data)
         delta_u.next_to(plus_2, RIGHT)
 
@@ -662,7 +686,7 @@ class SimplePIR(Slide):
 
         result_label = Tex(r"$\mathsf{q}$")
 
-        note = Tex(r"Next, compute the query (e.g. we want \\the element at row 1, col 0)\\Note that we mod $q = 7$", font_size=50)
+        note = Tex(r"Next, compute the query\\e.g. we want the element at row 1, col 0\\Note that we mod $q = 7$", font_size=50)
         note.to_edge(DOWN)
         self.add(note)
 
@@ -677,7 +701,6 @@ class SimplePIR(Slide):
         e_label = Tex(r"$\mathsf{e}$")
         e_label.next_to(e, UP)
         delta_u_label.next_to(delta_u, UP)
-        # delta_u_label.align_to(delta_u, LEFT)
         result_label.next_to(result, UP)
         self.add(a_label, s_label, e_label, delta_u_label, result_label)
 
@@ -692,26 +715,26 @@ class SimplePIR(Slide):
         times = Tex(r"$\times$")
         times.next_to(db, RIGHT)
 
-        q_data = [[1], [6]]
-        q = Matrix(q_data)
-        q.next_to(times, RIGHT)
+        qu_data = [[1], [6]]
+        qu = Matrix(qu_data)
+        qu.next_to(times, RIGHT)
 
         eq = Tex(r"$=$")
-        eq.next_to(q, RIGHT)
+        eq.next_to(qu, RIGHT)
         
-        ans_data = np.array(mat_mul(db_data, q_data)) % 7
+        ans_data = np.array(mat_mul(db_data, qu_data)) % 7
         ans = Matrix(ans_data)
         ans.next_to(eq, RIGHT)
 
-        group = Group(db, times, q, eq, ans)
+        group = Group(db, times, qu, eq, ans)
         group.center()
         self.add(group)
 
         db_label = Tex("$\mathsf{db}$")
         db_label.next_to(db, UP)
 
-        q_label = Tex("$\mathsf{q}$")
-        q_label.next_to(q, UP)
+        qu_label = Tex("$\mathsf{qu}$")
+        qu_label.next_to(qu, UP)
 
         ans_label = Tex("$\mathsf{ans}$")
         ans_label.next_to(ans, UP)
@@ -720,7 +743,7 @@ class SimplePIR(Slide):
         note.to_edge(DOWN)
         self.add(note)
 
-        self.add(db_label, q_label, ans_label)
+        self.add(db_label, qu_label, ans_label)
 
 
     def slide_23(self):
@@ -778,6 +801,28 @@ class SimplePIR(Slide):
         result_label.next_to(result, UP)
 
         self.add(ans_label, hint_label, s_label, result_label)
+
+
+    def slide_24(self):
+        # Title
+        title = Title("DoublePIR")
+        self.add(title)
+
+        simplepir_label = Text("SimplePIR")
+        simplepir_elems = Tex(r"$\mathsf{db}$, $\mathsf{hint}_c = \mathsf{db} \times A_1$")
+        simplepir_elems.next_to(simplepir_label, RIGHT)
+
+        doublepir_label = Text("DoublePIR")
+        doublepir_label.next_to(simplepir_label, DOWN)
+        doublepir_elems = Tex(r"$\mathsf{db}$, $\mathsf{hint}_s$, $\mathsf{hint}_c = \mathsf{db} \times A_2$")
+        doublepir_elems.next_to(doublepir_label, RIGHT)
+
+        note = Tex(r"i.e. recursively apply SimplePIR upon $\mathsf{hint}_c$")
+        note.to_edge(DOWN)
+        
+        group = Group(simplepir_label, simplepir_elems, doublepir_label, doublepir_elems)
+        group.center()
+        self.add(group, note)
 
 
     def construct(self):
@@ -897,6 +942,11 @@ class SimplePIR(Slide):
         self.clear()
 
         self.slide_23()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_24()
         self.wait(0.1)
         self.next_slide()
         self.clear()
