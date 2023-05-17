@@ -84,8 +84,6 @@ class SimplePIR(Slide):
         r_arrow.next_to(request, DOWN)
 
         r_arrow.generate_target()
-        # r_arrow.target.shift(2 * RIGHT)
-        # self.add(r_arrow)
 
         # Response
         response = Tex(response_text)
@@ -93,9 +91,6 @@ class SimplePIR(Slide):
 
         l_arrow = Arrow(start=RIGHT, end=LEFT)
         l_arrow.next_to(response, DOWN)
-        # l_arrow.generate_target()
-        # r_arrow.target.shift(2 * RIGHT)
-        # l_arrow.target.shift(2 * LEFT)
 
         # Note
         note = Tex(note_text)
@@ -108,18 +103,14 @@ class SimplePIR(Slide):
         # Group to center elements
         group = Group(request, r_arrow, response, l_arrow)
         group.center()
-        # r_arrow.target.shift(2 * RIGHT)
-        # l_arrow.target.shift(2 * LEFT)
 
         # Animation
         self.add(user, server)
         self.play(FadeIn(r_arrow), FadeIn(request))
-        # self.play(MoveToTarget(r_arrow))
         self.add(r_arrow)
         self.wait(0.1)
         self.add(l_arrow)
         self.play(FadeIn(l_arrow), FadeIn(response))
-        # self.play(MoveToTarget(l_arrow))
         self.add(l_arrow)
         self.wait(0.1)
         self.add(note)
@@ -133,7 +124,7 @@ class SimplePIR(Slide):
         # Bulleted list
         blist = BulletedList(
             "Private block explorers",
-            "Private medical encyclopedias",
+            "Private anti-phishing site blockers",
             "Private contact lookups",
             "Private precomputed witness data for ZK protocols"
         )
@@ -147,7 +138,7 @@ class SimplePIR(Slide):
 
         blist = BulletedList(
             "Matrices",
-            "Regev encryption",
+            "Regev encryption / Learning with Errors",
             "SimplePIR",
             "DoublePIR"
         )
@@ -163,24 +154,6 @@ class SimplePIR(Slide):
         m1_data = [[1, 0], [0, 1], [1, 0]]
 
         gen_mat_mul_slide(self, m0_data, m1_data)
-
-    # def slide_6(self):
-        # # Title
-        # title = Title("Regev encryption")
-        # self.add(title)
-
-        # encrypt = Tex(r"$c = A \times s + e + \lfloor q / p \rfloor \cdot \mu$")
-
-        # decrypt = Tex(r"$\mu = c - A \times s\; \mathsf{mod}\; q$\\rounded to the nearest multiple of $\lfloor q / p \rfloor$")
-        # decrypt.next_to(encrypt, DOWN, buff=1)
-
-        # note = Tex(r"Elements of $A$ and $s$ are mod $q$\\Plaintext $\mu$ is mod $p$\\$A$ is public, $s$ is secret")
-        # note.to_edge(DOWN)
-        # self.add(note)
-
-        # encrypt_and_decrypt = Group(encrypt, decrypt)
-        # encrypt_and_decrypt.center()
-        # self.add(encrypt_and_decrypt)
 
     def slide_6(self):
         # Title
@@ -224,7 +197,7 @@ class SimplePIR(Slide):
 
     def slide_7(self):
         # Title
-        title = Title("Regev encryption")
+        title = Title("Learning with Errors (LWE)")
         self.add(title)
 
         a_data = [[".", ".", "."], [".", ".", "."], [".", ".", "."]]
@@ -301,7 +274,6 @@ class SimplePIR(Slide):
         decrypt.next_to(label_1, DOWN)
         subtract_a_s = SurroundingRectangle(decrypt[0][4:7])
 
-        # note = e_note()
         note = Tex(r"$A \times s$ can only be found knowing $s$")
         note.next_to(decrypt, DOWN, buff=0.5)
 
@@ -437,7 +409,6 @@ class SimplePIR(Slide):
         eq = Tex(r"$=$")
         eq.next_to(qu, RIGHT)
 
-        # result = Tex("?")
         result = Matrix([["\mathsf{???}\;"], ["\mathsf{???}"]])
         result.next_to(eq, RIGHT)
 
@@ -512,24 +483,17 @@ class SimplePIR(Slide):
         hint_arrow = Arrow(start=RIGHT, end=LEFT)
         hint_arrow.next_to(hint, DOWN)
 
-        # hint_arrow.generate_target()
-        # hint_arrow.target.shift(2 * LEFT)
-
         # Note
         note = Tex(r"$\mathsf{hint}_c$ is sent beforehand.")
-        # note.next_to(hint_arrow, DOWN)
         note.to_edge(DOWN)
 
         # Server
-
         server = Text("Server")
         server.to_edge(RIGHT)
 
         # Animation
-
         self.add(user, server)
         self.play(FadeIn(hint_arrow), FadeIn(hint))
-        # self.play(MoveToTarget(hint_arrow))
         self.add(hint_arrow)
         self.add(note)
 
@@ -548,8 +512,6 @@ class SimplePIR(Slide):
 
         query_arrow = Arrow(start=LEFT, end=RIGHT)
         query_arrow.next_to(query, DOWN)
-        # query_arrow.generate_target()
-        # query_arrow.target.shift(2 * RIGHT)
 
         # Answer
         answer = Tex(r"$\mathsf{ans} = [\mathsf{e}(3), \mathsf{e(4)}]$")
@@ -557,8 +519,6 @@ class SimplePIR(Slide):
 
         answer_arrow = Arrow(start=RIGHT, end=LEFT)
         answer_arrow.next_to(answer, DOWN)
-        # answer_arrow.generate_target()
-        # answer_arrow.target.shift(2 * LEFT)
 
         # Note
         note = Tex(
@@ -578,12 +538,10 @@ class SimplePIR(Slide):
         self.add(user, server)
         self.add(query_arrow)
         self.play(FadeIn(query_arrow), FadeIn(query))
-        # self.play(MoveToTarget(query_arrow))
         self.add(query_arrow)
         self.wait(0.1)
         self.add(answer_arrow)
         self.play(FadeIn(answer_arrow), FadeIn(answer))
-        # self.play(MoveToTarget(answer_arrow))
         self.add(answer_arrow)
         self.add(note)
 
@@ -636,7 +594,7 @@ class SimplePIR(Slide):
         hint_label.next_to(hint, UP)
         self.add(hint_label)
 
-        note = Tex(r"e.g. we want the element at row 1, col 1\\Let $q=7, p=2$\\First, compute $\mathsf{hint} = \mathsf{db} \times A$")
+        note = Tex(r"e.g. we want the element at row 1, col 1\\Let $q=7, p=2$\\Server computes $\mathsf{hint} = \mathsf{db} \times A$")
         note.to_edge(DOWN)
         self.add(note)
 
@@ -687,7 +645,7 @@ class SimplePIR(Slide):
 
         qu_label = Tex(r"$\mathsf{qu}$")
 
-        note = Tex(r"Next, compute the query\\Note that we mod $q = 7$", font_size=50)
+        note = Tex(r"User computes the query\\Note that we mod $q = 7$", font_size=50)
         note.to_edge(DOWN)
         self.add(note)
 
@@ -742,7 +700,7 @@ class SimplePIR(Slide):
         ans_label = Tex("$\mathsf{ans}$")
         ans_label.next_to(ans, UP)
 
-        note = Tex(r"The server multiplies $\mathsf{db}$ and $\mathsf{qu}$ and \\returns the homomorphically encrypted row", font_size=50)
+        note = Tex(r"Server computes the homomorphically encrypted row", font_size=50)
         note.to_edge(DOWN)
         self.add(note)
 
@@ -778,9 +736,7 @@ class SimplePIR(Slide):
         eq = Tex(r"$=$")
         eq.next_to(s, RIGHT)
 
-        # result_data = np.array(ans_data) - np.array(mat_mul(hint_data, s_data))
-        # result_data = [result_data[0]]
-        result_data = [[6]] # hardcoded to avoid having to impl neg mod
+        result_data = [np.array(ans_data) - np.array(mat_mul(hint_data, s_data))][0]
         result = Matrix(result_data)
 
         result.next_to(eq)
@@ -789,7 +745,7 @@ class SimplePIR(Slide):
         group.center()
         self.add(group)
 
-        note = Tex(r"$6$ rounded to the nearest multiple of 3 \\and divided by 3 = 2 mod 2 = 0.\\$\mathsf{db}[1][1]$ does equal $0$. QED.")
+        note = Tex(r"$[5]$ rounded to the nearest multiple of 3 \\and divided by 3 = 2 mod 2 = 0.\\$\mathsf{db}[1][1]$ does equal $0$. QED.")
         note.to_edge(DOWN)
         self.add(note)
 
@@ -816,7 +772,7 @@ class SimplePIR(Slide):
 
         doublepir_label = Text("DoublePIR")
         doublepir_label.next_to(simplepir_label, DOWN)
-        doublepir_elems = Tex(r"$\mathsf{db}$, $\mathsf{hint}_s$, $\mathsf{hint}_c = \mathsf{db} \times A_2$")
+        doublepir_elems = Tex(r"$\mathsf{db}$, $\mathsf{hint}_s$, $\mathsf{hint}_c = \mathsf{hint}_s \times A_2$")
         doublepir_elems.next_to(doublepir_label, RIGHT)
 
         note = Tex(r"i.e. recursively apply SimplePIR upon $\mathsf{hint}_c$")
@@ -825,6 +781,81 @@ class SimplePIR(Slide):
         group = Group(simplepir_label, simplepir_elems, doublepir_label, doublepir_elems)
         group.center()
         self.add(group, note)
+
+
+    def slide_25(self):
+        self.slide_benchmark(
+            "SimplePIR on a 1GB database",
+            "121MB hint",
+            "242KB query",
+            "Benchmarks - 10GB/s/core throughput"
+        )
+
+
+    def slide_26(self):
+        self.slide_benchmark(
+            "DoublePIR on a 1GB database",
+            "16MB hint",
+            "345KB query",
+            "Benchmarks - 7.4GB/s/core throughput"
+        )
+
+        
+    def slide_27(self):
+        # Title
+        title = Title("Links")
+        self.add(title)
+
+        # Bulleted list
+        blist = BulletedList(
+            r"SimplePIR paper: https://eprint.iacr.org/2022/949.pdf",
+            r"PIR from scratch: https://blintzbase.com/posts/pir-and-fhe-from-scratch",
+            r"Sample code: https://geometryresearch.github.io/simplepir-rs",
+            font_size=40
+        )
+
+        blist.center()
+        self.add(blist)
+
+
+    def slide_benchmark(self, title, hint, query, note):
+        # Title
+        title = Title(title)
+        self.add(title)
+
+        # User
+        user = Text("User")
+        user.to_edge(LEFT)
+
+        # Hint
+        hint = Tex(hint)
+        hint_arrow = Arrow(start=RIGHT, end=LEFT)
+        hint_arrow.next_to(hint, DOWN)
+
+        # Query
+        query = Tex(query)
+        query.next_to(hint_arrow, DOWN, buff=1)
+        query_arrow = Arrow(start=LEFT, end=RIGHT)
+        query_arrow.next_to(query, DOWN)
+
+        # Note
+        note = Tex(note)
+        note.to_edge(DOWN)
+
+        # Server
+        server = Text("Server")
+        server.to_edge(RIGHT)
+
+        group = Group(user, server)
+        group.center()
+        self.add(note)
+
+        group2 = Group(hint, hint_arrow, query, query_arrow)
+        group2.center()
+
+        # Animation
+        self.add(user, server, hint, query, hint_arrow, query_arrow)
+        self.add(group)
 
 
     def construct(self):
@@ -949,6 +980,21 @@ class SimplePIR(Slide):
         self.clear()
 
         self.slide_24()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_25()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_26()
+        self.wait(0.1)
+        self.next_slide()
+        self.clear()
+
+        self.slide_27()
         self.wait(0.1)
         self.next_slide()
         self.clear()
