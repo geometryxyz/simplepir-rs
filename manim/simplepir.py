@@ -25,9 +25,9 @@ def example_data():
     hint = mat_mul(db, a)
 
     s = [[1], [0]]
-    e = [[2], [1]]
-    delta_u = [[3], [0]]
-    qu = np.array(mat_mul(a, s))+ np.array(e) + np.array(delta_u)
+    e = [[1], [1]]
+    delta_u = [[0], [3]]
+    qu = (np.array(mat_mul(a, s))+ np.array(e) + np.array(delta_u)) % 7
     ans = np.array(mat_mul(db, qu)) % 7
 
     return {
@@ -359,10 +359,10 @@ class SimplePIR(Slide):
         eq = Tex(r"$=$")
         eq.next_to(qu, RIGHT)
 
-        result = Matrix([[3], [4]])
+        result = Matrix([[3], [5]])
         result.next_to(eq, RIGHT)
 
-        note = Tex(r"We can multiply the by $[1, 0]$ to get the first row")
+        note = Tex(r"We can multiply the by $[1, 0]$ to get the first column")
         note.to_edge(DOWN)
 
         group = Group(m, times, qu, eq, result)
@@ -384,10 +384,10 @@ class SimplePIR(Slide):
         eq = Tex(r"$=$")
         eq.next_to(qu, RIGHT)
 
-        result = Matrix([[5], [6]])
+        result = Matrix([[4], [6]])
         result.next_to(eq, RIGHT)
 
-        note = Tex(r"We can multiply the matrix by $[0, 1]$ to get the second row")
+        note = Tex(r"We can multiply the matrix by $[0, 1]$ to get the second column")
         note.to_edge(DOWN)
 
         group = Group(m, times, qu, eq, result)
@@ -434,7 +434,7 @@ class SimplePIR(Slide):
         eq = Tex(r"$=$")
         eq.next_to(qu, RIGHT)
 
-        result = Matrix([["\mathsf{e}(3)\;"], ["\mathsf{e}(4)"]])
+        result = Matrix([["\mathsf{e}(3)\;"], ["\mathsf{e}(5)"]])
         result.next_to(eq, RIGHT)
 
         note = Tex(r"We'll get an encrypted row of the data.")
@@ -633,7 +633,7 @@ class SimplePIR(Slide):
         delta_u = Matrix(delta_u_data)
         delta_u.next_to(plus_2, RIGHT)
 
-        delta_u_label = Tex(r"$\lfloor 7 / 2 \rfloor \cdot [1, 0]$", font_size=35)
+        delta_u_label = Tex(r"$\lfloor 7 / 2 \rfloor \cdot [0, 1]$", font_size=35)
 
         eq = Tex(r"$=$")
         eq.next_to(delta_u, RIGHT)
@@ -677,6 +677,7 @@ class SimplePIR(Slide):
         times.next_to(db, RIGHT)
 
         qu_data = data["qu"]
+        qu_data %= 7
         qu = Matrix(qu_data)
         qu.next_to(times, RIGHT)
 
@@ -745,7 +746,7 @@ class SimplePIR(Slide):
         group.center()
         self.add(group)
 
-        note = Tex(r"$[5]$ rounded to the nearest multiple of 3 \\and divided by 3 = 2 mod 2 = 0.\\$\mathsf{db}[1][1]$ does equal $0$. QED.")
+        note = Tex("$[" + str(result_data[0][0]) + r"]$ rounded to the nearest multiple of 3 \\and divided by 3 = 0 mod 2 = 0.\\$\mathsf{db}[1][1]$ does equal $0$. QED.")
         note.to_edge(DOWN)
         self.add(note)
 
